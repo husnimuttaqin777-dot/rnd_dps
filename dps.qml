@@ -285,11 +285,11 @@ Window {
                 anchors.topMargin: 0
                 anchors.left: parent.left
                 anchors.leftMargin: 0
-                zoomLevel: 15
-					minimumZoomLevel: 10
-					maximumZoomLevel: 20
-                copyrightsVisible: false
-                antialiasing: false
+                zoomLevel : 1000.03
+				minimumZoomLevel: 10.03
+				maximumZoomLevel: 1000.4
+                copyrightsVisible: true
+                antialiasing: true
                 maximumTilt: 89.3
                 plugin: mapPlugin
                 activeMapType: supportedMapTypes[1]
@@ -304,49 +304,101 @@ Window {
 
                 visible :pond_map.checked ? false : true
 				
-					// ── Polygon layer — MapItemView culls off-screen items ──────────────
-					MapItemView {
-						model: allPolygons
-						delegate: MapPolygon {
-							path:         modelData.points
-							color:        modelData.color
-							opacity:      1.0
-							border.width: 1
-							border.color: "#333333"
-						}
-					}
+					Repeater {
+					model: allPolygons
 
-					// ── Label layer — only for large-enough polygons ──────────────────────
-					MapItemView {
-						model: allPolygons
-						delegate: MapQuickItem {
-							visible:       modelData.showLabel
-							z:             999
-							coordinate:    QtPositioning.coordinate(modelData.center.latitude, modelData.center.longitude)
-							anchorPoint.x: labelRect.width  / 2
-							anchorPoint.y: labelRect.height / 2
-							sourceItem: Rectangle {
-								id: labelRect
-								color:        "#ccffffff"
-								border.color: "black"
-								border.width: 1
-								radius:       4
-								width:        labelText.implicitWidth  + 10
-								height:       labelText.implicitHeight + 6
-								Text {
-									id: labelText
-									anchors.centerIn: parent
-									text:       modelData.value + " m"
-									color:      "black"
-									font.bold:  true
-									font.pointSize: 8
-									renderType: Text.NativeRendering
-								}
+					MapQuickItem {
+						z: 999  // agar di atas polygon
+						coordinate: QtPositioning.coordinate(modelData.center.latitude, modelData.center.longitude)
+						anchorPoint.x: 30
+						anchorPoint.y: 10
+						sourceItem: Rectangle {
+							color: "white"
+							border.color: "black"
+							border.width: 1
+							radius: 4
+							opacity: 0.7
+							width: textItem.paintedWidth + 10
+							height: textItem.paintedHeight + 6
+
+							Text {
+								id: textItem
+								anchors.centerIn: parent
+								text: modelData.value.toFixed(2) + " m"
+								color: "black"
+								font.bold: true
+								font.pointSize: 10
 							}
 						}
 					}
+				}
 
-						// Garis Pantai 1
+					
+				
+				
+				
+				Repeater {
+            model: allPolygons
+
+            MapPolygon {
+                path: modelData.points
+                border.width: 1
+                border.color: "black"
+				
+                // Warna biru berdasarkan kedalaman: makin dalam, makin gelap
+                //color: Qt.rgba(0, 0, 1, Math.min(1, modelData.value / 100)) // transparansi = 0~1
+				 opacity: 1.0
+
+				color: modelData.value < 0                 ? "#a80000" :        // Dangkal < 1m
+				   modelData.value > 0 && modelData.value < 4   ? "#df4000" :  // 1-5m
+				   modelData.value >= 4 && modelData.value < 8 ? "#f37700" :  // 5-10m
+				   modelData.value >= 8 && modelData.value < 12 ? "#f8ab00" : // 10-25m
+				  
+	               modelData.value >= 12 && modelData.value < 16   ? "#f8d800" :  // 1-5m
+				   modelData.value >= 16 && modelData.value < 20   ? "#f2f200" :  // 1-5m
+				   modelData.value >= 20 && modelData.value < 24   ? "#cef400" :  // 1-5m
+				   modelData.value >= 24 && modelData.value < 28   ? "#87e602" :  // 1-5m
+
+				   modelData.value >= 28 && modelData.value < 32   ? "#21d824" :  // 1-5m
+				   modelData.value >= 32 && modelData.value < 36   ? "#00c846" :  // 1-5m
+
+				   modelData.value >= 36 && modelData.value < 40   ? "#00b46b" :  // 1-5m
+				   modelData.value >= 40 && modelData.value < 44   ? "#009d8d" :  // 1-5m
+
+				   modelData.value >= 44 && modelData.value < 48 ? "#00b8d3" :  // 5-10m
+				   modelData.value >= 48 && modelData.value < 60 ? "#00daf8" : // 10-25m	
+
+				   															   "white"   // >=25m
+						MapQuickItem {
+							coordinate: modelData.center
+							anchorPoint.x: 30
+							anchorPoint.y: 10
+							visible : false
+							sourceItem: Rectangle {
+								color: "white"
+								opacity: 0.7
+								radius: 4
+								width: textItem.width + 10
+								height: textItem.height + 6
+								scale: Math.pow(2, map.zoomLevel - 15) 
+								
+
+								Text {
+									id: textItem
+									anchors.centerIn: parent
+									text: modelData.value + " m"
+									color: "black"
+									font.bold: true
+									font.pointSize: 10
+									
+								}
+							}
+						}
+					
+					}
+				}
+			
+		// Garis Pantai 1
 		MapPolyline {
             line.width: 4
             line.color: "red"
@@ -3471,11 +3523,11 @@ Window {
 		}
 		*/
 		
-		// Local tile server — avoids network round-trips on Armbian
+		// Plugin OSM yang dikustomisasi untuk OpenSeaMap
       Plugin {
         id: mapPlugin
         name: "osm"
-        PluginParameter { name: "osm.mapping.custom.host"; value: "http://localhost/osm/" }
+        PluginParameter { name: "osm.mapping.custom.host"; value: "https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png" }
         PluginParameter { name: "osm.mapping.providersrepository.disabled"; value: true }
     }
 
@@ -5621,8 +5673,8 @@ Window {
 		propeller4_properties.text = propeller4_position.x +"\n"+ propeller4_position.y
 		cog_properties.text = cog.x +"\n"+ cog.y
 		
-		// backend.tick() removed — tick logic now runs in BackgroundWorker thread
-		control_prop.text = backend.control_prop()
+		backend.tick("yes")
+		control_prop.text = backend.control_prop()//"ṅ \nė \nψ_dot\nẋ\nẏ"
 			
 		gps_status.color = backend.gps_status_color()
 		

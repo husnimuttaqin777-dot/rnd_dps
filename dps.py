@@ -12,6 +12,7 @@ import glob
 
 
 
+
 from PyQt5.QtCore import * 
 from PyQt5.QtGui import * 
 from PyQt5.QtQml import * 
@@ -83,81 +84,65 @@ from math import sqrt
 
 
 def geo_to_dict(coord):
-    return {"latitude": coord.latitude(), "longitude": coord.longitude()}
-
-def get_color(value):
-    return (
-        "#a80000" if value < 0 else
-        "#df4000" if value < 4 else
-        "#f37700" if value < 8 else
-        "#f8ab00" if value < 12 else
-        "#f8d800" if value < 16 else
-        "#f2f200" if value < 20 else
-        "#cef400" if value < 24 else
-        "#87e602" if value < 28 else
-        "#21d824" if value < 32 else
-        "#00c846" if value < 36 else
-        "#00b46b" if value < 40 else
-        "#009d8d" if value < 44 else
-        "#00b8d3" if value < 48 else
-        "#00daf8" if value < 60 else
-        "white"
-    )
-
-def rdp_simplify(points, epsilon=0.00003):
-    if len(points) < 3:
-        return points
-    def dist(p, a, b):
-        if a == b:
-            return math.hypot(p[0]-a[0], p[1]-a[1])
-        dx, dy = b[0]-a[0], b[1]-a[1]
-        mag = math.hypot(dx, dy)
-        u = max(0, min(1, ((p[0]-a[0])*dx + (p[1]-a[1])*dy) / (mag*mag)))
-        return math.hypot(p[0]-(a[0]+u*dx), p[1]-(a[1]+u*dy))
-    def rdp(pts):
-        if len(pts) < 3: return pts
-        s, e = pts[0], pts[-1]
-        md, mi = max((dist(pts[i], s, e), i) for i in range(1, len(pts)-1))
-        if md > epsilon:
-            return rdp(pts[:mi+1])[:-1] + rdp(pts[mi:])
-        return [s, e]
-    tuples = [(p.latitude(), p.longitude()) for p in points]
-    return [QGeoCoordinate(lat, lon) for lat, lon in rdp(tuples)]
+    return {
+        "latitude": coord.latitude(),
+        "longitude": coord.longitude()
+    }
 
 def load_depth_points_from_isobath(file_path=isobath_file):
-    pts = []
-    with open(file_path, newline='') as f:
-        for row in csv.DictReader(f):
+    depth_points = []
+    with open(file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
             try:
-                pts.append((float(row["Latitude"]), float(row["Longitude"]),
-                             float(row["Value1"]) if row["Value1"] else 0.0))
+                lat = float(row["Latitude"])
+                lon = float(row["Longitude"])
+                val = float(row["Value1"]) if row["Value1"] else 0.0
+                depth_points.append({"lat": lat, "lon": lon, "depth": val})
             except ValueError:
                 continue
-    return pts  # list of (lat, lon, depth) tuples — faster than dicts
+    return depth_points
 
 def find_two_nearest_points(lat, lon, depth_points):
-    # Uses tuples now: (lat, lon, depth)
-    if not depth_points:
+    distances = []
+    for point in depth_points:
+        if "lat" in point and "lon" in point and "depth" in point:
+            try:
+                dist = sqrt((lat - point["lat"])**2 + (lon - point["lon"])**2)
+                distances.append((dist, point))
+            except:
+                continue
+    distances.sort(key=lambda x: x[0])
+
+
+    if len(distances) >= 2:
+        return [distances[0][1], distances[1][1]]
+    elif len(distances) == 1:
+        return [distances[0][1], distances[0][1]]
+    else:
         return None
-    key = lambda p: (lat - p[0])**2 + (lon - p[1])**2
-    s = sorted(depth_points, key=key)
-    if len(s) >= 2:
-        return s[0], s[1]
-    return s[0], s[0]
 
 def idw_from_two_points(lat, lon, p1, p2, power=2):
-    d1 = math.hypot(lat - p1[0], lon - p1[1])
-    d2 = math.hypot(lat - p2[0], lon - p2[1])
-    if d1 == 0: return p1[2]
-    if d2 == 0: return p2[2]
-    w1 = 1 / d1**power
-    w2 = 1 / d2**power
-    return (w1*p1[2] + w2*p2[2]) / (w1 + w2)
+    def distance(p): return sqrt((lat - p["lat"])**2 + (lon - p["lon"])**2)
 
-def load_polygons(label_min_zoom_area=0.0001):
+    d1 = distance(p1)
+    d2 = distance(p2)
+
+    if d1 == 0: return p1["depth"]
+    if d2 == 0: return p2["depth"]
+
+    w1 = 1 / (d1 ** power)
+    w2 = 1 / (d2 ** power)
+
+    return (w1 * p1["depth"] + w2 * p2["depth"]) / (w1 + w2)
+
+def load_polygons():
     component_polygons = defaultdict(lambda: {"points": [], "type": "", "value": 0.0})
-    with open(isobath_file, newline='') as f:
-        for row in csv.DictReader(f):
+    polygons = []
+
+    with open(isobath_file, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
             try:
                 cid = int(row["ComponentId"])
                 lat = float(row["Latitude"])
@@ -165,32 +150,26 @@ def load_polygons(label_min_zoom_area=0.0001):
                 val = float(row["Value1"]) if row["Value1"] else 0.0
             except ValueError:
                 continue
-            component_polygons[cid]["points"].append((lat, lon))
+
+            component_polygons[cid]["points"].append(QGeoCoordinate(lat, lon))
             component_polygons[cid]["type"] = row["Type"]
             component_polygons[cid]["value"] = val
 
-    polygons = []
     for comp in component_polygons.values():
-        raw = comp["points"]
-        if len(raw) < 3:
-            continue
-        coords = rdp_simplify([QGeoCoordinate(la, lo) for la, lo in raw])
+        coords = comp["points"]
         if len(coords) < 3:
             continue
-        lats = [c.latitude()  for c in coords]
-        lons = [c.longitude() for c in coords]
-        val  = comp["value"]
-        area = (max(lats)-min(lats)) * (max(lons)-min(lons))
+
+        center_lat = sum(c.latitude() for c in coords) / len(coords)
+        center_lon = sum(c.longitude() for c in coords) / len(coords)
+
         polygons.append({
-            "points":    [geo_to_dict(p) for p in coords],
-            "type":      comp["type"],
-            "value":     f"{val:.1f}",
-            "color":     get_color(val),
-            "center":    {"latitude": sum(lats)/len(lats), "longitude": sum(lons)/len(lons)},
-            "showLabel": area >= label_min_zoom_area,
+            "points": [geo_to_dict(p) for p in coords],
+            "type": comp["type"],
+            "value": comp["value"],
+            "center": {"latitude": center_lat, "longitude": center_lon}
         })
-    print(f"Loaded {len(polygons)} polygons "
-          f"(avg {sum(len(p['points']) for p in polygons)//max(len(polygons),1)} pts each)")
+
     return polygons
 
 
@@ -1115,56 +1094,22 @@ def dual_gps_heading(lat1, lon1, lat2, lon2):
 ########## mengisi class table dengan instruksi pyqt5#############
 #----------------------------------------------------------------#
 
-global_points = body_to_latlon(val_latitude , val_longitude, heading_magneto, relative_points)
-
-
-# ── Background worker: runs tick() logic in a separate thread ─────────────────
-# This is the KEY fix: main.py does ZERO work on the Qt main thread after
-# startup. dps.py was running heavy numpy math, json.dump, csv writes, and
-# MQTT publishes inside a @pyqtSlot called by QML's 100ms timer — all on the
-# main thread, blocking every frame.  Moving it here frees the render loop.
-class BackgroundWorker(QObject):
-    def __init__(self, backend_ref):
-        super().__init__()
-        self.backend = backend_ref
-        self._running = True
-
-    @pyqtSlot()
-    def run(self):
-        while self._running:
-            try:
-                self.backend._do_tick()
-            except Exception as e:
-                print("Worker tick error:", e)
-            # 100 ms between ticks — same cadence as the old QML timer
-            QThread.msleep(100)
-
-    def stop(self):
-        self._running = False
-
-
-class table(QObject):
-    def __init__(self, parent=None):
+global_points = body_to_latlon(val_latitude , val_longitude, heading_magneto, relative_points)        
+        
+class table(QObject):    
+    def __init__(self, parent = None):
         super().__init__(parent)
         self.app = QApplication(sys.argv)
         self.engine = QQmlApplicationEngine(self)
-
-        # Load sonar data (fast tuples, not dicts)
+        # Load sonar data
         self.depth_data = load_depth_points_from_isobath(isobath_file)
         print("✅ Titik sonar terload:", len(self.depth_data))
 
         polygons = load_polygons()
+
         self.engine.rootContext().setContextProperty("allPolygons", polygons)
-        self.engine.rootContext().setContextProperty("backend", self)
+        self.engine.rootContext().setContextProperty("backend", self)    
         self.engine.load(QUrl("dps.qml"))
-
-        # Start background worker thread
-        self._worker_thread = QThread()
-        self._worker = BackgroundWorker(self)
-        self._worker.moveToThread(self._worker_thread)
-        self._worker_thread.started.connect(self._worker.run)
-        self._worker_thread.start()
-
         sys.exit(self.app.exec_())
 
 
@@ -1405,10 +1350,15 @@ class table(QObject):
     @pyqtSlot(float, float, result=float)
     def estimate_depth(self, lat, lon):
         global est
+        
         nearest = find_two_nearest_points(lat, lon, self.depth_data)
+        
         if nearest is None:
-            return -1.0
-        est = round(idw_from_two_points(lat, lon, nearest[0], nearest[1]), 2)
+            #print("❌ Tidak ada titik sonar valid.")
+            return -1.0  # ➤ kode khusus untuk 'no data'
+
+        est = round(idw_from_two_points(lat, lon, nearest[0], nearest[1]) ,2)
+        #print(f"✅ Kedalaman estimasi: {est} m")
         return est
     
     
@@ -1864,11 +1814,6 @@ class table(QObject):
 #----------------------------------------------------------------#
     @pyqtSlot(str)
     def tick(self, value):
-        # No-op: tick logic now runs in BackgroundWorker thread.
-        # QML still calls this from its timer — that's fine, it returns instantly.
-        pass
-
-    def _do_tick(self):
         global heading_target
         global gps_time
         global gps_time_prev
@@ -1939,7 +1884,7 @@ class table(QObject):
         global utm_lat_lon_wp
         global x
         global y
-        # NOTE: 'global time' removed — do not shadow the time module
+        global time
         
         global target_rpm1
         global target_rpm2
@@ -2269,15 +2214,10 @@ class table(QObject):
                 "lon_target": val_longitude
             }
 
-        # Menyimpan ke dalam file JSON — throttled to 1 Hz, not 10 Hz
+        # Menyimpan ke dalam file JSON
         file_path = 'state_space.json'
-        if (time.time() - getattr(self, '_json_write_prev', 0)) > 1.0:
-            try:
-                with open(file_path, 'w') as f:
-                    json.dump(state_space, f)
-            except Exception:
-                pass
-            self._json_write_prev = time.time()
+        with open(file_path, 'w') as f:
+            json.dump(state_space, f)
         
         '''
         if (control_style == "individual" and joystick_mode == 1):
@@ -3294,3 +3234,4 @@ if __name__ == "__main__":
     
     
 #----------------------------------------------------------------#
+

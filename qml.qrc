@@ -1,0 +1,45 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>syergielogofix.jpg</file>
+        <file>navigasi.png</file>
+        <file>compasslogo.png</file>
+        <file>Line1.qml</file>
+        <file>Line.qml</file>
+        <file>ponton.png</file>
+        <file>Screenshot from 2021-09-13 10-31-51.png</file>
+        <file>up_new.png</file>
+        <file>side_new.png</file>
+        <file>front_new.png</file>
+        <file>Line2.qml</file>
+        <file>ROV Frame.png</file>
+        <file>PropellerGaugeStyle.qml</file>
+        <file>EngineGaugeStyle.qml</file>
+        <file>PropIcon.png</file>
+        <file>GUI DP Ponton.png</file>
+        <file>steering.png</file>
+        <file>arrow.png</file>
+        <file>arrowyellow.png</file>
+        <file>arrowred.png</file>
+        <file>needle.png</file>
+        <file>needleyellow.png</file>
+        <file>CHH.png</file>
+        <file>status.png</file>
+        <file>positioning.png</file>
+        <file>backup-mainqml.qml</file>
+        <file>bouy.png</file>
+        <file>ondong-tahuna.qml</file>
+        <file>ondong.qml</file>
+        <file>Line3.qml</file>
+        <file>Line4.qml</file>
+        <file>Line5.qml</file>
+        <file>tahuna.png</file>
+        <file>GUI DP Ponton versi 2.png</file>
+        <file>G.png</file>
+        <file>Line6.qml</file>
+        <file>Line7.qml</file>
+        <file>Line8.qml</file>
+        <file>windy.png</file>
+        <file>navionic.png</file>
+    </qresource>
+</RCC>

@@ -688,6 +688,7 @@ df = pd.read_csv(csv_file)
 lat_seacurrent = df["latitude"].tolist()
 long_seacurrent = df["longitude"].tolist()
 dir_seacurrent = df["direction"].tolist()
+speed_seacurrent = df["sea_current_speed"].tolist()
 
 print(lat_seacurrent)
 print(long_seacurrent)
@@ -706,6 +707,32 @@ for i in range(len(lat_seacurrent)):
     })
 
 print(current_data)
+
+
+current_dir = 0
+current_speed = 0
+
+def find_speed_dir(lat_ref, lon_ref):
+
+    min_dist = float('inf')
+    nearest_idx = -1
+
+    for i in range(len(lat_seacurrent)):
+
+        # hitung jarak sederhana
+        dist = math.sqrt(
+            (lat_seacurrent[i] - lat_ref)**2 +
+            (long_seacurrent[i] - lon_ref)**2
+        )
+
+        if dist < min_dist:
+            min_dist = dist
+            nearest_idx = i
+
+    if nearest_idx == -1:
+        return None, None
+
+    return dir_seacurrent[nearest_idx], speed_seacurrent[nearest_idx]
 
 
 
@@ -933,18 +960,62 @@ class table(QObject):
         self._worker.error.connect(self.on_update_error)
         self._worker.start()
 
+    
+    '''
     def on_update_finished(self):
         global lat_seacurrent, long_seacurrent, dir_seacurrent
+        global current_dir, current_speed
 
         csv_file = "sea_current_now.csv"
         df = pd.read_csv(csv_file)
         lat_seacurrent = df["latitude"].tolist()
         long_seacurrent = df["longitude"].tolist()
         dir_seacurrent = df["direction"].tolist()
+        speed_seacurrent  = df["sea_current_speed"].tolist()
+        
+
+        current_dir, current_speed = find_speed_dir(val_latitude, val_longitude)
 
         print("update_data.py finished — safe to update UI here")
         self.updateFinished.emit()   
     
+    '''
+
+    def on_update_finished(self):
+
+        global lat_seacurrent
+        global long_seacurrent
+        global dir_seacurrent
+        global speed_seacurrent
+        global current_dir
+        global current_speed
+
+        csv_file = "sea_current_now.csv"
+        df = pd.read_csv(csv_file)
+
+        lat_seacurrent = df["latitude"].tolist()
+        long_seacurrent = df["longitude"].tolist()
+        dir_seacurrent = df["direction"].tolist()
+        speed_seacurrent = df["sea_current_speed"].tolist()
+
+        current_dir, current_speed = find_speed_dir(
+            val_latitude,
+            val_longitude
+        )
+
+        print("update_data.py finished — safe to update UI here")
+        print (f"Current direction: {current_dir}, Current speed: {current_speed}")
+        self.updateFinished.emit()
+    
+
+    @pyqtSlot(result=float)
+    def current_dir(self):
+        return float(current_dir)
+    
+    @pyqtSlot(result=float)
+    def current_speed(self):
+        return float(current_speed)
+
     def on_update_error(self, msg):
         print(f"update_data.py failed: {msg}")
     

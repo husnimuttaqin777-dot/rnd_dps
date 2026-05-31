@@ -586,7 +586,7 @@ Window {
 			x : 518
 			y : -10
 			z : 999
-			width : 155
+			width : 165
 			height : 70
 			color : "#012340"
 			border.width : 2
@@ -696,7 +696,7 @@ Window {
                 }
 
 				Timer{
-					interval: 360000
+					interval: 3600000
 					running: true
 					repeat: true
 					onTriggered: {
@@ -5245,6 +5245,8 @@ Window {
 			
 			slope.text = "slope       : " + backend.slope() + "°"
 
+			seacurrent.text = "est current : " + backend.current_speed() + " m/s " + backend.current_dir() + "°"		
+			//console.log(backend.current_speed(), backend.current_dir())
 			if (line1.checked == true){
 				upload_csv()
 				backend.estimate_rpl(1)

@@ -184,6 +184,55 @@ Window {
 		}
 
 	}
+
+
+	property var currentArray: []
+
+    
+
+    // ── ListModel populated from the array at startup ────────────────
+    ListModel {
+        id: current_sea_model
+    }
+
+    function update_seacurrent_data(){
+
+        current_sea_model.clear()
+
+        currentArray = backend.getCurrentArray()
+
+        console.log("Jumlah data:", currentArray.length)
+
+        for(var i=0; i<currentArray.length; i++){
+
+            console.log(
+                currentArray[i].lat,
+                currentArray[i].lon,
+                currentArray[i].dir
+            )
+
+            current_sea_model.append({
+                lat: currentArray[i].lat,
+                lon: currentArray[i].lon,
+                dir: currentArray[i].dir
+            })
+        }
+    }
+
+    
+        
+    
+
+    Connections {
+        target: backend
+
+        function onUpdateFinished() {
+            current_sea_model.clear()  
+            update_seacurrent_data()
+        }
+
+    }
+
 	
 	
 	Rectangle{
@@ -214,60 +263,6 @@ Window {
             property real lati : -6.000507
             property real longi : 106.687493
 			
-
-			Rectangle {
-				width: parent.width
-                height: parent.height
-				visible :pond_map.checked ? true : false
-				color : "#FF7F38"
-
-
-				Rectangle {
-				id : pond_illustration
-				anchors.horizontalCenter: parent.horizontalCenter
-				anchors.verticalCenter: parent.verticalCenter
-				width: 800
-                height: 500
-				color : "#0487D9"
-				border.color : "#993D09"
-				border.width : 15
-
-
-				Rectangle{
-					//vessel
-					x : 100
-					y : 50
-					z:999
-					width: 100
-               		height: 25
-					color : "grey"
-					border.color : "#373A40"
-				}
-
-				MouseArea {
-					anchors.fill: parent
-					onClicked: { 
-
-					}
-				}
-
-	
-
-				}
-
-				TextField{
-					x : 90
-					y : 30
-				}
-
-				TextField{
-					x : 700
-					y : 600
-				}
-				
-			}
-
-
 			Map{
                 id: map
                 x: 0
@@ -304,11 +299,121 @@ Window {
 
                 visible :pond_map.checked ? false : true
 				
-					Repeater {
+				
+				
+				
+				
+				Repeater {
+				model: allPolygons
+
+				MapPolygon {
+					path: modelData.points
+					border.width: 1
+					border.color: "black"
+					
+					// Warna biru berdasarkan kedalaman: makin dalam, makin gelap
+					//color: Qt.rgba(0, 0, 1, Math.min(1, modelData.value / 100)) // transparansi = 0~1
+					opacity: 1.0
+
+					color: modelData.value < 0                 ? "#a80000" :        // Dangkal < 1m
+					modelData.value > 0 && modelData.value < 4   ? "#df4000" :  // 1-5m
+					modelData.value >= 4 && modelData.value < 8 ? "#f37700" :  // 5-10m
+					modelData.value >= 8 && modelData.value < 12 ? "#f8ab00" : // 10-25m
+					
+					modelData.value >= 12 && modelData.value < 16   ? "#f8d800" :  // 1-5m
+					modelData.value >= 16 && modelData.value < 20   ? "#f2f200" :  // 1-5m
+					modelData.value >= 20 && modelData.value < 24   ? "#cef400" :  // 1-5m
+					modelData.value >= 24 && modelData.value < 28   ? "#87e602" :  // 1-5m
+
+					modelData.value >= 28 && modelData.value < 32   ? "#21d824" :  // 1-5m
+					modelData.value >= 32 && modelData.value < 36   ? "#00c846" :  // 1-5m
+
+					modelData.value >= 36 && modelData.value < 40   ? "#00b46b" :  // 1-5m
+					modelData.value >= 40 && modelData.value < 44   ? "#009d8d" :  // 1-5m
+
+					modelData.value >= 44 && modelData.value < 48 ? "#00b8d3" :  // 5-10m
+					modelData.value >= 48 && modelData.value < 60 ? "#00daf8" : // 10-25m	
+
+																				"white"   // >=25m
+							MapQuickItem {
+								coordinate: modelData.center
+								anchorPoint.x: 30
+								anchorPoint.y: 10
+								visible : false
+								sourceItem: Rectangle {
+									color: "white"
+									opacity: 0.7
+									radius: 4
+									width: textItem.width + 10
+									height: textItem.height + 6
+									scale: Math.pow(2, map.zoomLevel - 15) 
+									
+
+									Text {
+										id: textItem
+										anchors.centerIn: parent
+										text: modelData.value + " m"
+										color: "black"
+										font.bold: true
+										font.pointSize: 10
+										
+									}
+								}
+							}
+						
+						}
+					}
+			
+				MapItemView {
+				model: current_sea_model
+				delegate: Component {
+					MapQuickItem {
+						coordinate: QtPositioning.coordinate(lat, lon)
+						anchorPoint.x: 2
+						anchorPoint.y: 12
+
+						sourceItem: Shape {
+							width: 24
+							height: 24
+							rotation: dir - 90   // ← +90 offset here
+							antialiasing: true
+							layer.enabled: true
+							layer.samples: 4
+
+							ShapePath {
+								strokeColor: "#bd0b0b"
+								strokeWidth: 2
+								fillColor:   "transparent"
+								capStyle:    ShapePath.RoundCap
+								joinStyle:   ShapePath.RoundJoin
+								startX: 2;  startY: 12
+								PathLine { x: 17; y: 12 }
+							}
+
+							ShapePath {
+								strokeColor: "#bd0b0b"
+								strokeWidth: 2
+								fillColor:   "transparent"
+								capStyle:    ShapePath.RoundCap
+								joinStyle:   ShapePath.RoundJoin
+								startX: 22; startY: 12
+								PathLine { x: 15; y: 7  }
+								PathMove  { x: 22; y: 12 }
+								PathLine  { x: 15; y: 17 }
+							}
+						}
+					}
+				}
+			}
+				
+				
+
+
+				Repeater {
 					model: allPolygons
 
 					MapQuickItem {
-						z: 999  // agar di atas polygon
+						//z: 999  // agar di atas polygon
 						coordinate: QtPositioning.coordinate(modelData.center.latitude, modelData.center.longitude)
 						anchorPoint.x: 30
 						anchorPoint.y: 10
@@ -334,208 +439,145 @@ Window {
 				}
 
 					
-				
-				
-				
-				Repeater {
-            model: allPolygons
 
-            MapPolygon {
-                path: modelData.points
-                border.width: 1
-                border.color: "black"
-				
-                // Warna biru berdasarkan kedalaman: makin dalam, makin gelap
-                //color: Qt.rgba(0, 0, 1, Math.min(1, modelData.value / 100)) // transparansi = 0~1
-				 opacity: 1.0
-
-				color: modelData.value < 0                 ? "#a80000" :        // Dangkal < 1m
-				   modelData.value > 0 && modelData.value < 4   ? "#df4000" :  // 1-5m
-				   modelData.value >= 4 && modelData.value < 8 ? "#f37700" :  // 5-10m
-				   modelData.value >= 8 && modelData.value < 12 ? "#f8ab00" : // 10-25m
-				  
-	               modelData.value >= 12 && modelData.value < 16   ? "#f8d800" :  // 1-5m
-				   modelData.value >= 16 && modelData.value < 20   ? "#f2f200" :  // 1-5m
-				   modelData.value >= 20 && modelData.value < 24   ? "#cef400" :  // 1-5m
-				   modelData.value >= 24 && modelData.value < 28   ? "#87e602" :  // 1-5m
-
-				   modelData.value >= 28 && modelData.value < 32   ? "#21d824" :  // 1-5m
-				   modelData.value >= 32 && modelData.value < 36   ? "#00c846" :  // 1-5m
-
-				   modelData.value >= 36 && modelData.value < 40   ? "#00b46b" :  // 1-5m
-				   modelData.value >= 40 && modelData.value < 44   ? "#009d8d" :  // 1-5m
-
-				   modelData.value >= 44 && modelData.value < 48 ? "#00b8d3" :  // 5-10m
-				   modelData.value >= 48 && modelData.value < 60 ? "#00daf8" : // 10-25m	
-
-				   															   "white"   // >=25m
-						MapQuickItem {
-							coordinate: modelData.center
-							anchorPoint.x: 30
-							anchorPoint.y: 10
-							visible : false
-							sourceItem: Rectangle {
-								color: "white"
-								opacity: 0.7
-								radius: 4
-								width: textItem.width + 10
-								height: textItem.height + 6
-								scale: Math.pow(2, map.zoomLevel - 15) 
-								
-
-								Text {
-									id: textItem
-									anchors.centerIn: parent
-									text: modelData.value + " m"
-									color: "black"
-									font.bold: true
-									font.pointSize: 10
-									
-								}
-							}
-						}
-					
-					}
+				// Garis Pantai 1
+				MapPolyline {
+					line.width: 4
+					line.color: "red"
+					path: [
+						QtPositioning.coordinate(0.507141684000032, 103.287186211),
+						QtPositioning.coordinate(0.506990175000055, 103.286999569),
+						QtPositioning.coordinate(0.506892708000066, 103.286773149),
+						QtPositioning.coordinate(0.506794187000025, 103.286546954),
+						QtPositioning.coordinate(0.506689298000026, 103.286323863),
+						QtPositioning.coordinate(0.506623123000054, 103.286090565),
+						QtPositioning.coordinate(0.506529263000061, 103.285865821),
+						QtPositioning.coordinate(0.506444210000041, 103.285635375),
+						QtPositioning.coordinate(0.506356335000021, 103.285405166),
+						QtPositioning.coordinate(0.506296690000056, 103.28516867),
+						QtPositioning.coordinate(0.506252001000064, 103.284927084),
+						QtPositioning.coordinate(0.50619615100004, 103.284686887),
+						QtPositioning.coordinate(0.506118289000028, 103.284454724),
+						QtPositioning.coordinate(0.506060619000039, 103.28421967),
+						QtPositioning.coordinate(0.506062500000041, 103.283971364),
+						QtPositioning.coordinate(0.506017369000062, 103.28372802),
+						QtPositioning.coordinate(0.50593998100004, 103.283494957),
+						QtPositioning.coordinate(0.505881257000055, 103.283256162),
+						QtPositioning.coordinate(0.505784000000062, 103.283030071),
+						QtPositioning.coordinate(0.505696317000059, 103.282802688),
+						QtPositioning.coordinate(0.505608776000031, 103.282585945),
+						QtPositioning.coordinate(0.505527286000074, 103.282357154),
+						QtPositioning.coordinate(0.505449834000046, 103.282123942),
+						QtPositioning.coordinate(0.505393255000058, 103.281886821),
+						QtPositioning.coordinate(0.505352409000068, 103.281643495),
+						QtPositioning.coordinate(0.505308918000026, 103.281400438),
+						QtPositioning.coordinate(0.505258513000058, 103.281165945),
+						QtPositioning.coordinate(0.505220090000023, 103.280929522),
+						QtPositioning.coordinate(0.505211493000047, 103.280717086),
+						QtPositioning.coordinate(0.505165740000052, 103.280478316),
+						QtPositioning.coordinate(0.50511080900003, 103.280241451),
+						QtPositioning.coordinate(0.505047364000063, 103.280010201),
+						QtPositioning.coordinate(0.505016358000034, 103.279766331),
+						QtPositioning.coordinate(0.504963932000067, 103.279529289),
+						QtPositioning.coordinate(0.504900987000042, 103.279290844),
+						QtPositioning.coordinate(0.504848947000028, 103.279051201),
+						QtPositioning.coordinate(0.504833713000039, 103.278803645),
+						QtPositioning.coordinate(0.504802645000041, 103.278559907),
+						QtPositioning.coordinate(0.504766374000042, 103.278319003),
+						QtPositioning.coordinate(0.504736956000045, 103.278074194),
+						QtPositioning.coordinate(0.504712123000047, 103.277830733),
+						QtPositioning.coordinate(0.504703445000075, 103.277589423)
+					]
 				}
-			
-		// Garis Pantai 1
-		MapPolyline {
-            line.width: 4
-            line.color: "red"
-			   path: [
-                QtPositioning.coordinate(0.507141684000032, 103.287186211),
-                QtPositioning.coordinate(0.506990175000055, 103.286999569),
-                QtPositioning.coordinate(0.506892708000066, 103.286773149),
-                QtPositioning.coordinate(0.506794187000025, 103.286546954),
-                QtPositioning.coordinate(0.506689298000026, 103.286323863),
-                QtPositioning.coordinate(0.506623123000054, 103.286090565),
-                QtPositioning.coordinate(0.506529263000061, 103.285865821),
-				QtPositioning.coordinate(0.506444210000041, 103.285635375),
-                QtPositioning.coordinate(0.506356335000021, 103.285405166),
-                QtPositioning.coordinate(0.506296690000056, 103.28516867),
-                QtPositioning.coordinate(0.506252001000064, 103.284927084),
-                QtPositioning.coordinate(0.50619615100004, 103.284686887),
-				QtPositioning.coordinate(0.506118289000028, 103.284454724),
-                QtPositioning.coordinate(0.506060619000039, 103.28421967),
-                QtPositioning.coordinate(0.506062500000041, 103.283971364),
-                QtPositioning.coordinate(0.506017369000062, 103.28372802),
-                QtPositioning.coordinate(0.50593998100004, 103.283494957),
-				QtPositioning.coordinate(0.505881257000055, 103.283256162),
-                QtPositioning.coordinate(0.505784000000062, 103.283030071),
-                QtPositioning.coordinate(0.505696317000059, 103.282802688),
-                QtPositioning.coordinate(0.505608776000031, 103.282585945),
-                QtPositioning.coordinate(0.505527286000074, 103.282357154),
-				QtPositioning.coordinate(0.505449834000046, 103.282123942),
-                QtPositioning.coordinate(0.505393255000058, 103.281886821),
-                QtPositioning.coordinate(0.505352409000068, 103.281643495),
-                QtPositioning.coordinate(0.505308918000026, 103.281400438),
-                QtPositioning.coordinate(0.505258513000058, 103.281165945),
-				QtPositioning.coordinate(0.505220090000023, 103.280929522),
-                QtPositioning.coordinate(0.505211493000047, 103.280717086),
-                QtPositioning.coordinate(0.505165740000052, 103.280478316),
-                QtPositioning.coordinate(0.50511080900003, 103.280241451),
-                QtPositioning.coordinate(0.505047364000063, 103.280010201),
-				QtPositioning.coordinate(0.505016358000034, 103.279766331),
-                QtPositioning.coordinate(0.504963932000067, 103.279529289),
-                QtPositioning.coordinate(0.504900987000042, 103.279290844),
-                QtPositioning.coordinate(0.504848947000028, 103.279051201),
-                QtPositioning.coordinate(0.504833713000039, 103.278803645),
-				QtPositioning.coordinate(0.504802645000041, 103.278559907),
-                QtPositioning.coordinate(0.504766374000042, 103.278319003),
-                QtPositioning.coordinate(0.504736956000045, 103.278074194),
-                QtPositioning.coordinate(0.504712123000047, 103.277830733),
-				QtPositioning.coordinate(0.504703445000075, 103.277589423)
-            ]
-        }
 
-        // garis Pantai 2
-        MapPolyline {
-            line.width: 4
-            line.color: "red"
-            path: [
-                QtPositioning.coordinate(0.527464976000033, 103.268206495),
-                QtPositioning.coordinate(0.527404920000038, 103.268419219),
-                QtPositioning.coordinate(0.527495374000068, 103.268516574),
-                QtPositioning.coordinate(0.52752259600004, 103.26872758),
-				QtPositioning.coordinate(0.527599063000025, 103.268928467),
-                QtPositioning.coordinate(0.527669443000036, 103.269122229),
-                QtPositioning.coordinate(0.527685820000045, 103.269329613),
-                QtPositioning.coordinate(0.52777171200006, 103.269540702),
-				QtPositioning.coordinate(0.527745836000065, 103.269756905),
-                QtPositioning.coordinate(0.527839097000026, 103.269950704),
-                QtPositioning.coordinate(0.527903359000049, 103.270175911),
-                QtPositioning.coordinate(0.527985771000033, 103.270401928),
-				QtPositioning.coordinate(0.528040340000075, 103.270594044),
-				QtPositioning.coordinate(0.528111679000062, 103.270782053),
-                QtPositioning.coordinate(0.528163538000058, 103.270905486),
-                QtPositioning.coordinate(0.528174758000034, 103.271112557),
-				QtPositioning.coordinate(0.52826572500004, 103.271280335),
-				QtPositioning.coordinate(0.528269657000067, 103.271517586),
-                QtPositioning.coordinate(0.528213770000036, 103.271746052),
-                QtPositioning.coordinate(0.528310376000036, 103.271944998),
-				QtPositioning.coordinate(0.528337789000034, 103.272155681),
-				QtPositioning.coordinate(0.52840692500007, 103.272269458),
-                QtPositioning.coordinate(0.528391146000047, 103.272508291),
-                QtPositioning.coordinate(0.528360274000022, 103.27274587),
-				QtPositioning.coordinate(0.528383667000071, 103.272983786),
-				QtPositioning.coordinate(0.528376543000036, 103.273224729),
-                QtPositioning.coordinate(0.528376893000029, 103.273466679),
-                QtPositioning.coordinate(0.528377378000073, 103.273706376),
-				QtPositioning.coordinate(0.52841479500006, 103.273948635),
-				QtPositioning.coordinate(0.528339731000074, 103.274179977),
-				QtPositioning.coordinate(0.528315514000042, 103.274422996),
-				QtPositioning.coordinate(0.528278914000055, 103.274655122),
-                QtPositioning.coordinate(0.528263818000028, 103.274896255),
-                QtPositioning.coordinate(0.528242334000026, 103.275135224),
-				QtPositioning.coordinate(0.528222781000068, 103.275377624),
-				QtPositioning.coordinate(0.528239533000033, 103.275597704),
-				QtPositioning.coordinate(0.528226889000052, 103.275835697),
-				QtPositioning.coordinate(0.528274829000054, 103.276070089),
-                QtPositioning.coordinate(0.528282131000026, 103.276296563),
-                QtPositioning.coordinate(0.528305212000021, 103.276531989),
-				QtPositioning.coordinate(0.528357750000055, 103.276754032),
-				QtPositioning.coordinate(0.528376979000029, 103.27699567),
-				QtPositioning.coordinate(0.528358175000051, 103.27723682),
-				QtPositioning.coordinate(0.52837308200003, 103.27743156),
-                QtPositioning.coordinate(0.528392300000064, 103.277663592),
-                QtPositioning.coordinate(0.528400379000061, 103.27786604),
-				QtPositioning.coordinate(0.528464768000049, 103.278049007),
-				QtPositioning.coordinate(0.528502285000059, 103.278285664),
-				QtPositioning.coordinate(0.528519781000057, 103.278500987),
-				QtPositioning.coordinate(0.528520201000049, 103.278716399),
-                QtPositioning.coordinate(0.528548570000055, 103.278946547),
-                QtPositioning.coordinate(0.52855207500005, 103.279188955)
-            ]
-        }
-		
-        // garis trnching
-        MapPolyline {
-            line.width: 4
-            line.color: "yellow"
-            path: [
-                QtPositioning.coordinate(0.523002, 103.278594),
-                QtPositioning.coordinate(0.523041, 103.278865)
-            ]
-        }
+				// garis Pantai 2
+				MapPolyline {
+					line.width: 4
+					line.color: "red"
+					path: [
+						QtPositioning.coordinate(0.527464976000033, 103.268206495),
+						QtPositioning.coordinate(0.527404920000038, 103.268419219),
+						QtPositioning.coordinate(0.527495374000068, 103.268516574),
+						QtPositioning.coordinate(0.52752259600004, 103.26872758),
+						QtPositioning.coordinate(0.527599063000025, 103.268928467),
+						QtPositioning.coordinate(0.527669443000036, 103.269122229),
+						QtPositioning.coordinate(0.527685820000045, 103.269329613),
+						QtPositioning.coordinate(0.52777171200006, 103.269540702),
+						QtPositioning.coordinate(0.527745836000065, 103.269756905),
+						QtPositioning.coordinate(0.527839097000026, 103.269950704),
+						QtPositioning.coordinate(0.527903359000049, 103.270175911),
+						QtPositioning.coordinate(0.527985771000033, 103.270401928),
+						QtPositioning.coordinate(0.528040340000075, 103.270594044),
+						QtPositioning.coordinate(0.528111679000062, 103.270782053),
+						QtPositioning.coordinate(0.528163538000058, 103.270905486),
+						QtPositioning.coordinate(0.528174758000034, 103.271112557),
+						QtPositioning.coordinate(0.52826572500004, 103.271280335),
+						QtPositioning.coordinate(0.528269657000067, 103.271517586),
+						QtPositioning.coordinate(0.528213770000036, 103.271746052),
+						QtPositioning.coordinate(0.528310376000036, 103.271944998),
+						QtPositioning.coordinate(0.528337789000034, 103.272155681),
+						QtPositioning.coordinate(0.52840692500007, 103.272269458),
+						QtPositioning.coordinate(0.528391146000047, 103.272508291),
+						QtPositioning.coordinate(0.528360274000022, 103.27274587),
+						QtPositioning.coordinate(0.528383667000071, 103.272983786),
+						QtPositioning.coordinate(0.528376543000036, 103.273224729),
+						QtPositioning.coordinate(0.528376893000029, 103.273466679),
+						QtPositioning.coordinate(0.528377378000073, 103.273706376),
+						QtPositioning.coordinate(0.52841479500006, 103.273948635),
+						QtPositioning.coordinate(0.528339731000074, 103.274179977),
+						QtPositioning.coordinate(0.528315514000042, 103.274422996),
+						QtPositioning.coordinate(0.528278914000055, 103.274655122),
+						QtPositioning.coordinate(0.528263818000028, 103.274896255),
+						QtPositioning.coordinate(0.528242334000026, 103.275135224),
+						QtPositioning.coordinate(0.528222781000068, 103.275377624),
+						QtPositioning.coordinate(0.528239533000033, 103.275597704),
+						QtPositioning.coordinate(0.528226889000052, 103.275835697),
+						QtPositioning.coordinate(0.528274829000054, 103.276070089),
+						QtPositioning.coordinate(0.528282131000026, 103.276296563),
+						QtPositioning.coordinate(0.528305212000021, 103.276531989),
+						QtPositioning.coordinate(0.528357750000055, 103.276754032),
+						QtPositioning.coordinate(0.528376979000029, 103.27699567),
+						QtPositioning.coordinate(0.528358175000051, 103.27723682),
+						QtPositioning.coordinate(0.52837308200003, 103.27743156),
+						QtPositioning.coordinate(0.528392300000064, 103.277663592),
+						QtPositioning.coordinate(0.528400379000061, 103.27786604),
+						QtPositioning.coordinate(0.528464768000049, 103.278049007),
+						QtPositioning.coordinate(0.528502285000059, 103.278285664),
+						QtPositioning.coordinate(0.528519781000057, 103.278500987),
+						QtPositioning.coordinate(0.528520201000049, 103.278716399),
+						QtPositioning.coordinate(0.528548570000055, 103.278946547),
+						QtPositioning.coordinate(0.52855207500005, 103.279188955)
+					]
+				}
+				
+				// garis trnching
+				MapPolyline {
+					line.width: 4
+					line.color: "yellow"
+					path: [
+						QtPositioning.coordinate(0.523002, 103.278594),
+						QtPositioning.coordinate(0.523041, 103.278865)
+					]
+				}
 
-        MapPolyline {
-            line.width: 4
-            line.color: "yellow"
-            path: [
-                QtPositioning.coordinate(0.511883, 103.281622),
-                QtPositioning.coordinate(0.511942, 103.281863)
-            ]
-        }
-		
-		MapPolyline {
-            line.width: 4
-            line.color: "yellow"
-            path: [
-                QtPositioning.coordinate(-7.744028235552112, 108.9969443586086),
-                QtPositioning.coordinate(-7.744788592591423, 108.9974932082828)
-            ]
-        }
-		
+				MapPolyline {
+					line.width: 4
+					line.color: "yellow"
+					path: [
+						QtPositioning.coordinate(0.511883, 103.281622),
+						QtPositioning.coordinate(0.511942, 103.281863)
+					]
+				}
+				
+				MapPolyline {
+					line.width: 4
+					line.color: "yellow"
+					path: [
+						QtPositioning.coordinate(-7.744028235552112, 108.9969443586086),
+						QtPositioning.coordinate(-7.744788592591423, 108.9974932082828)
+					]
+				}
+				
 
 		
 		Rectangle{
@@ -548,13 +590,6 @@ Window {
 			color : "#012340"
 			border.width : 2
 			border.color : line_color
-			
-			
-			
-			
-			
-			
-			
 			}
 
 
@@ -5349,7 +5384,7 @@ Window {
     }
 
 	Component.onCompleted: {
-                
+                update_seacurrent_data()
 				points = backend.points()
 				console.log(points)
 				points2 = backend.points2()
@@ -5371,16 +5406,7 @@ Window {
 	
 	
 	function drawAll() {
-            // Bersihkan map
-			/* Hapus semua item KECUALI marker kapal
-			for (var i = map.mapItems.length - 1; i >= 0; i--) {
-				if (map.mapItems[i] !== marker) {  // ⛔ Jangan hapus kapal
-					map.removeMapItem(map.mapItems[i]);
-				}
-			}
-			*/
             
-
             // Tambahkan MapCircle dan Label
             
 			for (var i = 0; i < points.length; i++) {
@@ -5398,36 +5424,7 @@ Window {
                     }
                 `, map, "Circle_" + i);
                 map.addMapItem(circle);
-/*
-                var label = Qt.createQmlObject(`
-                    import QtQuick 2.12
-                    import QtLocation 5.11
-                    import QtPositioning 5.11
-                    MapQuickItem {
-                        coordinate: QtPositioning.coordinate(${p.latitude}, ${p.longitude})
-                        anchorPoint.x: 40
-                        anchorPoint.y: 60
-                        sourceItem: Rectangle {
-                            color: "white"
-                            border.color: "black"
-                            border.width: 1
-                            radius: 4
-                            width: textItem.paintedWidth + 10
-                            height: textItem.paintedHeight + 6
 
-                            Text {
-                                id: textItem
-                                text: "${p.name}"
-                                anchors.centerIn: parent
-                                color: "black"
-                                font.pointSize: 10
-                                font.bold: true
-                            }
-                        }
-                    }
-                `, map, "Label_" + i);
-                map.addMapItem(label);
-            */
 			}
 			
 			

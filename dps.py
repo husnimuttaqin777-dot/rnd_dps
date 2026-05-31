@@ -679,6 +679,34 @@ error_body_fixed = np.array([[0],[0],[0]])
 
 
 
+import pandas as pd
+
+csv_file = "sea_current_now.csv"
+
+df = pd.read_csv(csv_file)
+
+lat_seacurrent = df["latitude"].tolist()
+long_seacurrent = df["longitude"].tolist()
+dir_seacurrent = df["direction"].tolist()
+
+print(lat_seacurrent)
+print(long_seacurrent)
+print(dir_seacurrent)
+
+current_data = []
+
+for i in range(len(lat_seacurrent)):
+
+    current_data.append({
+
+        "lat": lat_seacurrent[i],
+        "lon": long_seacurrent[i],
+        "dir": dir_seacurrent[i]
+
+    })
+
+print(current_data)
+
 
 
 control_prop = ""
@@ -845,8 +873,33 @@ def dual_gps_heading(lat1, lon1, lat2, lon2):
 #----------------------------------------------------------------#
 
 global_points = body_to_latlon(val_latitude , val_longitude, heading_magneto, relative_points)        
-        
+
+import subprocess
+
+
+class UpdateWorker(QThread):
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+
+    def __init__(self, msg):
+        super().__init__()
+        self.msg = msg
+
+    def run(self):
+        """Runs in a background thread — never blocks the GUI."""
+        try:
+            subprocess.run(["python", "request API.py", self.msg], check=True)
+            self.finished.emit()
+        except subprocess.CalledProcessError as e:
+            self.error.emit(f"Script failed with code {e.returncode}")
+        except Exception as e:
+            self.error.emit(str(e))
+
+
+
+
 class table(QObject):    
+    updateFinished = pyqtSignal()
     def __init__(self, parent = None):
         super().__init__(parent)
         self.app = QApplication(sys.argv)
@@ -862,7 +915,35 @@ class table(QObject):
         self.engine.load(QUrl("dps.qml"))
         sys.exit(self.app.exec_())
 
+    @pyqtSlot(result='QVariantList')
+    def getCurrentArray(self):
+        current_data = []
+        for i in range(len(lat_seacurrent)):
+            current_data.append({
+                "lat": lat_seacurrent[i],
+                "lon": long_seacurrent[i],
+                "dir": dir_seacurrent[i]
+            })
+        return current_data
 
+    @pyqtSlot(str)
+    def update_data(self, msg):
+        self._worker = UpdateWorker(msg)
+        self._worker.finished.connect(self.on_update_finished)
+        self._worker.error.connect(self.on_update_error)
+        self._worker.start()
+
+    def on_update_finished(self):
+        global lat_seacurrent, long_seacurrent, dir_seacurrent
+
+        csv_file = "sea_current_now.csv"
+        df = pd.read_csv(csv_file)
+        lat_seacurrent = df["latitude"].tolist()
+        long_seacurrent = df["longitude"].tolist()
+        dir_seacurrent = df["direction"].tolist()
+
+        print("update_data.py finished — safe to update UI here")
+        self.updateFinished.emit()   
     
     @pyqtSlot(result='QVariantList')
     def point_a(self):

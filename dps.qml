@@ -221,7 +221,6 @@ Window {
 
     
         
-    
 
     Connections {
         target: backend
@@ -364,6 +363,8 @@ Window {
 						}
 					}
 			
+				//arah arus laut
+
 				MapItemView {
 				model: current_sea_model
 				delegate: Component {
@@ -381,8 +382,8 @@ Window {
 							layer.samples: 4
 
 							ShapePath {
-								strokeColor: "#bd0b0b"
-								strokeWidth: 2
+								strokeColor: "#000080"
+								strokeWidth: 3
 								fillColor:   "transparent"
 								capStyle:    ShapePath.RoundCap
 								joinStyle:   ShapePath.RoundJoin
@@ -391,8 +392,8 @@ Window {
 							}
 
 							ShapePath {
-								strokeColor: "#bd0b0b"
-								strokeWidth: 2
+								strokeColor: "#000080"
+								strokeWidth: 3
 								fillColor:   "transparent"
 								capStyle:    ShapePath.RoundCap
 								joinStyle:   ShapePath.RoundJoin
@@ -418,8 +419,8 @@ Window {
 						anchorPoint.x: 30
 						anchorPoint.y: 10
 						sourceItem: Rectangle {
-							color: "white"
-							border.color: "black"
+							color: "transparent"
+							border.color: "transparent"
 							border.width: 1
 							radius: 4
 							opacity: 0.7
@@ -599,22 +600,19 @@ Window {
 				y: parent.height/3
 				z : 999
 				width : 180
-				height : 80
+				height : 100
 				color : "white"
 				border.color: "black"
 				border.width: 3
-				
-				
-				
-				
+			
 				Text {
 				id : depth_est
-                x:40
-                y:15
+                x:5
+                y:20
                 width: 95
                 height: 19
                 color: "black"
-                text: "depth est : 0m"
+                text: "depth est    : 0m"
                 font.pixelSize: 15
                 font.styleName: "Bold"
                 
@@ -623,12 +621,26 @@ Window {
 				
 				Text {
 				id : slope
-                x:40
+                x:5
                 y:40
                 width: 95
                 height: 19
                 color: "black"
-                text: "Slope : 0°"
+                text: "Slope       : 0°"
+                font.pixelSize: 15
+                font.styleName: "Bold"
+                
+				}
+
+
+				Text {
+				id : seacurrent
+                x:5
+                y:60
+                width: 95
+                height: 19
+                color: "black"
+                text: "seacurrent : 0.5Kt/112°"
                 font.pixelSize: 15
                 font.styleName: "Bold"
                 
@@ -683,329 +695,19 @@ Window {
                     id: li
                 }
 
-                
-
-                Line_rpl1{
-                    id:rpl_ondong_manado
-                }
-
-				Line_rpl2{
-                    id:rpl_ondong_tahuna
-
-                }
-
-                Line5{
-                    id:sanana_taliabu
-                }
-				
-				
-               Line6{
-                    id:route
-                }
-				
-				
-                Line7{
-                    id:circleondong_tahuna
-                }
-
-
-                Line8{
-                    id:actaliabu_sanana
-                }
-
-				
-				// selayar lingga
-				MapCircle { 
-                    center {
-                        latitude: -0.286233332999927
-                        longitude: 104.482733333 //#1
-                    }
-                    radius: 50
-                    color: '#46a2da'
-                    border.color: "#190a33"
-                    border.width: 3
-                }
-				
-				
-				MapCircle { 
-                    center {
-                        latitude: -0.285329787999956
-                        longitude: 104.49097057 //#2
-                    }
-                    radius: 50
-                    color: '#46a2da'
-                    border.color: "#190a33"
-                    border.width: 3
-                }
-				
-				
-				MapCircle { 
-                    center {
-                        latitude: -0.286317332999943
-                        longitude: 104.502558028 //#3
-                    }
-                    radius: 50
-                    color: '#46a2da'
-                    border.color: "#190a33"
-                    border.width: 3
-                }
-				
-				MapCircle { 
-                    center {
-                        latitude:-0.28126231799996
-                        longitude: 104.512625181 //#4
-                    }
-                    radius: 50
-                    color: '#46a2da'
-                    border.color: "#190a33"
-                    border.width: 3
-                }
-				
-				
-				MapCircle { 
-                    center {
-                        latitude:-0.276440679999951
-                        longitude: 104.514920141 //#5
-                    }
-                    radius: 50
-                    color: '#46a2da'
-                    border.color: "#190a33"
-                    border.width: 3
-                }
-				
-				MapCircle { 
-                    center {
-                        latitude:-0.273599999999931
-                        longitude: 104.51545 //#6
-                    }
-                    radius: 50
-                    color: '#46a2da'
-                    border.color: "#190a33"
-                    border.width: 3
-                }
-
-				// dabo selayar
-				
-				MapCircle {
-					center {
-						latitude: -0.276440679999951
-						longitude: 104.514920141 //#5
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
+				Timer{
+					interval: 360000
+					running: true
+					repeat: true
+					onTriggered: {
+						console.log("Updating seacurrent data...")
+						backend.update_data("update")
 					}
 				}
-
-				MapCircle {
-					center {
-						latitude: -0.341294
-						longitude: 104.462844
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.340964
-						longitude: 104.462765
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.339872
-						longitude: 104.462503
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.338025
-						longitude: 104.462061
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.335381
-						longitude: 104.461428
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.33275
-						longitude: 104.460797
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.330567
-						longitude: 104.460275
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.328868
-						longitude: 104.459868
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-				MapCircle {
-					center {
-						latitude: -0.328686
-						longitude: 104.459825
-					}
-					radius: 50
-					color: '#46a2da'
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-
-				//batam buluh
-				MapCircle {
-					center {
-						latitude: 1.02601
-						longitude: 103.92565
-					}
-					radius: 50
-					color: "#46a2da"
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-				MapCircle {
-					center {
-						latitude: 1.02573
-						longitude: 103.92547
-					}
-					radius: 50
-					color: "#46a2da"
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-				MapCircle {
-					center {
-						latitude: 1.02182
-						longitude: 103.92303 
-					}
-					radius: 50
-					color: "#46a2da"
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-				MapCircle {
-					center {
-						latitude: 1.01952
-						longitude: 103.92350
-					}
-					radius: 50
-					color: "#46a2da"
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-				MapCircle {
-					center {
-						latitude: 1.01757
-						longitude: 103.92500
-					}
-					radius: 50
-					color: "#46a2da"
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-				
-				MapCircle {
-					center {
-						latitude: 1.01833
-						longitude: 103.92597
-					}
-					radius: 50
-					color: "#46a2da"
-					border {
-						color: "#190a33"
-						width: 3
-					}
-				}
-
-
-
-				
-
-				
-
 
                 Timer {
-					
-
                     function updateloc() {
-					
-                     
-					
+				
 					if (li1.pathLength() < 500){
                                 var text = md1.count + 1;
 
@@ -1014,7 +716,6 @@ Window {
 											   
 					}
 
-					
                        if (tracking_line.checked == true){
 							var text = md1.count + 1;
 
@@ -5383,8 +5084,12 @@ Window {
 		}
     }
 
+	
 	Component.onCompleted: {
+				console.log("Application started")
+				backend.update_data("update")
                 update_seacurrent_data()
+				
 				points = backend.points()
 				console.log(points)
 				points2 = backend.points2()
@@ -5536,9 +5241,9 @@ Window {
 			
 			backend.calculate_slope((latitude_position_value.text), (longitude_position_value.text))
 
-			depth_est.text = "depth est : " + backend.est() + " m"
+			depth_est.text = "depth est    : " + backend.est() + " m"
 			
-			slope.text = "slope : " + backend.slope() + "°"
+			slope.text = "slope       : " + backend.slope() + "°"
 
 			if (line1.checked == true){
 				upload_csv()

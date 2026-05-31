@@ -945,6 +945,10 @@ class table(QObject):
         print("update_data.py finished — safe to update UI here")
         self.updateFinished.emit()   
     
+    def on_update_error(self, msg):
+        print(f"update_data.py failed: {msg}")
+    
+
     @pyqtSlot(result='QVariantList')
     def point_a(self):
         lat_a, long_a = global_points["a"]

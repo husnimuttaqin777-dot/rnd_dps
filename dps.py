@@ -1004,12 +1004,17 @@ class table(QObject):
             long_seacurrent = df["longitude"].tolist()
             dir_seacurrent = df["direction"].tolist()
             speed_seacurrent = df["sea_current_speed"].tolist()
+
+            current_dir, current_speed = find_speed_seacurrent(
+                val_latitude,
+                val_longitude
+            )
         except:
-            pass
-        current_dir, current_speed = find_speed_seacurrent(
-            val_latitude,
-            val_longitude
-        )
+            lat_seacurrent = []
+            long_seacurrent = []
+            dir_seacurrent = 0
+            speed_seacurrent = 0
+        
 
         
 

@@ -22,7 +22,7 @@ zone_lon = [103.893515, 103.924360, 103.919063, 103.895587]
 
 
 # ── HOW MANY POINTS inside the zone ──────────────────────────────
-n_points = 100   # ← change this number
+n_points = 20   # ← change this number
 # ─────────────────────────────────────────────────────────────────
 
 

@@ -683,12 +683,12 @@ import pandas as pd
 
 csv_file = "sea_current_now.csv"
 
-df = pd.read_csv(csv_file)
+#df = pd.read_csv(csv_file)
 
-lat_seacurrent = df["latitude"].tolist()
-long_seacurrent = df["longitude"].tolist()
-dir_seacurrent = df["direction"].tolist()
-speed_seacurrent = df["sea_current_speed"].tolist()
+lat_seacurrent = []#df["latitude"].tolist()
+long_seacurrent = []#df["longitude"].tolist()
+dir_seacurrent = []#df["direction"].tolist()
+speed_seacurrent = []#df["sea_current_speed"].tolist()
 
 print(lat_seacurrent)
 print(long_seacurrent)
@@ -997,13 +997,15 @@ class table(QObject):
         global dir_wind
 
         csv_file = "sea_current_now.csv"
-        df = pd.read_csv(csv_file)
-
-        lat_seacurrent = df["latitude"].tolist()
-        long_seacurrent = df["longitude"].tolist()
-        dir_seacurrent = df["direction"].tolist()
-        speed_seacurrent = df["sea_current_speed"].tolist()
-
+        try:
+            df = pd.read_csv(csv_file)
+        
+            lat_seacurrent = df["latitude"].tolist()
+            long_seacurrent = df["longitude"].tolist()
+            dir_seacurrent = df["direction"].tolist()
+            speed_seacurrent = df["sea_current_speed"].tolist()
+        except:
+            pass
         current_dir, current_speed = find_speed_seacurrent(
             val_latitude,
             val_longitude

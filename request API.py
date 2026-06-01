@@ -22,7 +22,7 @@ zone_lon = [103.893515, 103.924360, 103.919063, 103.895587]
 
 
 # ── HOW MANY POINTS inside the zone ──────────────────────────────
-n_points = 20   # ← change this number
+n_points = 30   # ← change this number
 # ─────────────────────────────────────────────────────────────────
 
 
@@ -132,7 +132,7 @@ with ThreadPoolExecutor(max_workers=20) as executor:
     futures = {executor.submit(fetch, lat, lon): (lat, lon) for lat, lon in coords}
     for future in as_completed(futures):
         lat, lon = futures[future]
-        #done += 1
+        done += 1
         try:
             rows.append(future.result())
             print(f"Request {done}/{total} OK")

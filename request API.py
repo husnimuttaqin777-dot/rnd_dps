@@ -68,21 +68,60 @@ else:
     print("csv belum ada")
 
 
+from datetime import datetime
+import requests
+
 def fetch(lat, lon):
+
     url = (
         f"https://marine-api.open-meteo.com/v1/marine?"
         f"latitude={lat}&longitude={lon}"
         f"&hourly=ocean_current_velocity,ocean_current_direction"
         f"&forecast_days=1"
+        f"&timezone=Asia/Jakarta"
     )
+
     r = requests.get(url, timeout=5)
+
     data = r.json()
+
+    hourly = data["hourly"]
+
+    times = hourly["time"]
+
+    current_time = datetime.now().strftime(
+        "%Y-%m-%dT%H:00"
+    )
+
+    try:
+
+        idx = times.index(current_time)
+
+    except ValueError:
+
+        idx = 0
+        print(
+            f"time {current_time} not found, fallback idx 0"
+        )
+
     return {
-        "latitude":          lat,
-        "longitude":         lon,
-        "time":              data["hourly"]["time"][0],
-        "sea_current_speed": data["hourly"]["ocean_current_velocity"][0],
-        "direction":         data["hourly"]["ocean_current_direction"][0],
+
+        "latitude": lat,
+
+        "longitude": lon,
+
+        "time": times[idx],
+
+        "sea_current_speed":
+            hourly[
+                "ocean_current_velocity"
+            ][idx],
+
+        "direction":
+            hourly[
+                "ocean_current_direction"
+            ][idx],
+
     }
 
 
@@ -93,14 +132,22 @@ with ThreadPoolExecutor(max_workers=20) as executor:
     futures = {executor.submit(fetch, lat, lon): (lat, lon) for lat, lon in coords}
     for future in as_completed(futures):
         lat, lon = futures[future]
-        done += 1
+        #done += 1
         try:
             rows.append(future.result())
             print(f"Request {done}/{total} OK")
         except Exception as e:
             print(f"ERROR {lat:.4f} {lon:.4f} — {e}")
 
+
+
+
+
+
+
 df = pd.DataFrame(rows)
 df.to_csv(filename, index=False)
 print("saved:", filename)
 print(df.head())
+
+

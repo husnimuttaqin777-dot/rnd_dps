@@ -712,7 +712,12 @@ print(current_data)
 current_dir = 0
 current_speed = 0
 
-def find_speed_dir(lat_ref, lon_ref):
+lat_wind = []
+long_wind = []
+wind_dir = 0
+wind_speed = 0
+
+def find_speed_seacurrent(lat_ref, lon_ref):
 
     min_dist = float('inf')
     nearest_idx = -1
@@ -953,6 +958,21 @@ class table(QObject):
             })
         return current_data
 
+
+
+    @pyqtSlot(result='QVariantList')
+    def getWindArray(self):
+        wind_data = []
+        for i in range(len(lat_wind)):
+            wind_data.append({
+                "lat": lat_wind[i],
+                "lon": long_wind[i],
+                "dir": dir_wind[i]
+            })
+        return wind_data
+
+
+
     @pyqtSlot(str)
     def update_data(self, msg):
         self._worker = UpdateWorker(msg)
@@ -961,25 +981,6 @@ class table(QObject):
         self._worker.start()
 
     
-    '''
-    def on_update_finished(self):
-        global lat_seacurrent, long_seacurrent, dir_seacurrent
-        global current_dir, current_speed
-
-        csv_file = "sea_current_now.csv"
-        df = pd.read_csv(csv_file)
-        lat_seacurrent = df["latitude"].tolist()
-        long_seacurrent = df["longitude"].tolist()
-        dir_seacurrent = df["direction"].tolist()
-        speed_seacurrent  = df["sea_current_speed"].tolist()
-        
-
-        current_dir, current_speed = find_speed_dir(val_latitude, val_longitude)
-
-        print("update_data.py finished — safe to update UI here")
-        self.updateFinished.emit()   
-    
-    '''
 
     def on_update_finished(self):
 
@@ -990,6 +991,11 @@ class table(QObject):
         global current_dir
         global current_speed
 
+        
+        global lat_wind
+        global long_wind
+        global dir_wind
+
         csv_file = "sea_current_now.csv"
         df = pd.read_csv(csv_file)
 
@@ -998,10 +1004,13 @@ class table(QObject):
         dir_seacurrent = df["direction"].tolist()
         speed_seacurrent = df["sea_current_speed"].tolist()
 
-        current_dir, current_speed = find_speed_dir(
+        current_dir, current_speed = find_speed_seacurrent(
             val_latitude,
             val_longitude
         )
+
+        
+
 
         print("update_data.py finished — safe to update UI here")
         print (f"Current direction: {current_dir}, Current speed: {current_speed}")

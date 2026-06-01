@@ -188,6 +188,8 @@ Window {
 
 	property var currentArray: []
 
+	property var windArray: []
+
     
 
     // ── ListModel populated from the array at startup ────────────────
@@ -195,21 +197,25 @@ Window {
         id: current_sea_model
     }
 
+	ListModel {
+        id: wind_model
+    }
+
     function update_seacurrent_data(){
-
         current_sea_model.clear()
-
         currentArray = backend.getCurrentArray()
-
         console.log("Jumlah data:", currentArray.length)
 
         for(var i=0; i<currentArray.length; i++){
 
-            console.log(
+            /*
+			console.log(
                 currentArray[i].lat,
                 currentArray[i].lon,
                 currentArray[i].dir
             )
+			*/
+			
 
             current_sea_model.append({
                 lat: currentArray[i].lat,
@@ -217,6 +223,11 @@ Window {
                 dir: currentArray[i].dir
             })
         }
+
+
+		//wind_model.clear()
+		//windArray = backend.getWindArray()
+
     }
 
     
@@ -228,6 +239,8 @@ Window {
         function onUpdateFinished() {
             current_sea_model.clear()  
             update_seacurrent_data()
+
+			
         }
 
     }
@@ -314,24 +327,24 @@ Window {
 					//color: Qt.rgba(0, 0, 1, Math.min(1, modelData.value / 100)) // transparansi = 0~1
 					opacity: 1.0
 
-					color: modelData.value < 0                 ? "#a80000" :        // Dangkal < 1m
-					modelData.value > 0 && modelData.value < 4   ? "#df4000" :  // 1-5m
-					modelData.value >= 4 && modelData.value < 8 ? "#f37700" :  // 5-10m
-					modelData.value >= 8 && modelData.value < 12 ? "#f8ab00" : // 10-25m
+					color: modelData.value < 0                 ? "#a80000" :       
+					modelData.value > 0 && modelData.value < 4   ? "#df4000" :  
+					modelData.value >= 4 && modelData.value < 8 ? "#f37700" :  
+					modelData.value >= 8 && modelData.value < 12 ? "#f8ab00" : 
 					
-					modelData.value >= 12 && modelData.value < 16   ? "#f8d800" :  // 1-5m
-					modelData.value >= 16 && modelData.value < 20   ? "#f2f200" :  // 1-5m
-					modelData.value >= 20 && modelData.value < 24   ? "#cef400" :  // 1-5m
-					modelData.value >= 24 && modelData.value < 28   ? "#87e602" :  // 1-5m
+					modelData.value >= 12 && modelData.value < 16   ? "#f8d800" :  
+					modelData.value >= 16 && modelData.value < 20   ? "#f2f200" :  
+					modelData.value >= 20 && modelData.value < 24   ? "#cef400" :  
+					modelData.value >= 24 && modelData.value < 28   ? "#87e602" :  
 
-					modelData.value >= 28 && modelData.value < 32   ? "#21d824" :  // 1-5m
-					modelData.value >= 32 && modelData.value < 36   ? "#00c846" :  // 1-5m
+					modelData.value >= 28 && modelData.value < 32   ? "#21d824" :  
+					modelData.value >= 32 && modelData.value < 36   ? "#00c846" :  
 
-					modelData.value >= 36 && modelData.value < 40   ? "#00b46b" :  // 1-5m
-					modelData.value >= 40 && modelData.value < 44   ? "#009d8d" :  // 1-5m
+					modelData.value >= 36 && modelData.value < 40   ? "#00b46b" :  
+					modelData.value >= 40 && modelData.value < 44   ? "#009d8d" :  
 
-					modelData.value >= 44 && modelData.value < 48 ? "#00b8d3" :  // 5-10m
-					modelData.value >= 48 && modelData.value < 60 ? "#00daf8" : // 10-25m	
+					modelData.value >= 44 && modelData.value < 48 ? "#00b8d3" :  
+					modelData.value >= 48 && modelData.value < 60 ? "#00daf8" : 	
 
 																				"white"   // >=25m
 							MapQuickItem {

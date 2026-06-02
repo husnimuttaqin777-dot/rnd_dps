@@ -708,15 +708,28 @@ Window {
                     id: li
                 }
 
-				Timer{
-					interval: 1800000
+				Timer {
+
+					property int lastHourTriggered: -1
+
+					interval: 1000
 					running: true
 					repeat: true
+
 					onTriggered: {
-						console.log("Updating seacurrent data...")
-						backend.update_data("update")
+						var now = new Date()
+
+						if (now.getMinutes() === 5 &&
+							now.getHours() !== lastHourTriggered) {
+							lastHourTriggered = now.getHours()
+							console.log("Updating seacurrent data...")
+							backend.update_data("update")
+						}
 					}
 				}
+
+
+				
 
                 Timer {
                     function updateloc() {

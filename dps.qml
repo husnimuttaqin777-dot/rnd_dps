@@ -232,7 +232,7 @@ Window {
 
     
         
-
+	
     Connections {
         target: backend
 
@@ -243,7 +243,11 @@ Window {
 			
         }
 
+
+
     }
+
+	
 
 	
 	
@@ -609,6 +613,7 @@ Window {
 
 			
 			Rectangle{
+				id : est_layout
 				x:10
 				y: parent.height/3
 				z : 999
@@ -617,6 +622,24 @@ Window {
 				color : "white"
 				border.color: "black"
 				border.width: 3
+
+				Button{
+					id : ship_parameter
+					x : 0
+					y : -est_layout.height/2
+					text : "ship parameter"
+
+					Rectangle{
+							width : parent.width
+							height : parent.height
+							color : ship_parameter.checked ? "blue" : "gray"
+						}
+
+
+					onClicked:{
+						wnd_ship_parameter.visible = true
+					}
+				}
 			
 				Text {
 				id : depth_est
@@ -707,6 +730,9 @@ Window {
 				Line{
                     id: li
                 }
+
+
+				
 
 				Timer {
 
@@ -1116,17 +1142,6 @@ Window {
         }
 
 		Text {
-			id : line_length
-			x : 10
-			y : 10
-			text : "Line Length : 0 m"
-			font.pixelSize : 15
-			color : "blue"
-			font.family: "Helvetica"
-			font.bold : true
-		}
-		
-		Text {
 				id : position_error
                 x : 10
                 y: 40
@@ -1181,6 +1196,7 @@ Window {
             checked: false
 
 			Text{
+				id : line_length
 				x : 0
 				y : -25
 				text : "RULER MEASUREMENT"
@@ -2585,18 +2601,30 @@ Window {
                 font.styleName: "Bold"
                 font.weight: Font.Bold
 			}
-            
 
-            
-
-			
 			
 			}
-			
-		
-		
-		
-		
+
+			Rectangle {
+			id : ship_type_rect 
+			y : parent.height/1.7
+			height : parent.height/10
+			width : parent.width
+			color : "#00000000"
+			border.width : 2
+			border.color : "#08da82"
+
+			Text{
+				id: ship_type_text
+				anchors.horizontalCenter: parent.horizontalCenter
+				anchors.verticalCenter: parent.verticalCenter
+                color: "#D95204"
+                text: ("BARGE")
+                font.pixelSize: parent.height/3
+                font.styleName: "Bold"
+                font.weight: Font.Bold
+			}
+		}
 		
 		}
 		
@@ -3888,23 +3916,7 @@ Window {
 	}
 
 
-	Button{
-		id : ship_parameter
-		x : 400
-		y : 650
-		text : "ship parameter"
-
-		Rectangle{
-				width : parent.width
-				height : parent.height
-				color : ship_parameter.checked ? "blue" : "gray"
-			}
-
-
-		onClicked:{
-			wnd_ship_parameter.visible = true
-		}
-	}
+	
 
 
 
@@ -4429,33 +4441,33 @@ Window {
 			checked : true
 			checkable : true
 			onClicked: {
-				lct_select.checked = false
-				tug_select.checked = false
+				tug1_select.checked = false
+				tug2_select.checked = false
 			}
 		}
 
 		Button{
-			id : lct_select
+			id : tug1_select
 			x : 550
 			y : 250
-			text : "LCT"
+			text : "Tug 1"
 			checked : false
 			checkable : true
 			onClicked: {
 				barge_select.checked = false
-				tug_select.checked = false
+				tug2_select.checked = false
 			}
 		}
 
 		Button{
-			id : tug_select
+			id : tug2_select
 			x : 550
 			y : 300
-			text : "Tug"
+			text : "Tug 2"
 			checked : false
 			checkable : true
 			onClicked: {
-				lct_select.checked = false
+				tug1_select.checked = false
 				barge_select.checked = false
 			}
 		}
@@ -5297,27 +5309,28 @@ Window {
 		running: true
 		onTriggered: {
 
-            var p1 = backend.point_a()
+
+            var p1 = backend.get_barge_point("a")
 			a_lat = p1[0]
 			a_long = p1[1]
 			
-			var p2 = backend.point_b()
+			var p2 = backend.get_barge_point("b")
 			b_lat = p2[0]
 			b_long = p2[1]
 			
-			var p3 = backend.point_c()
+			var p3 = backend.get_barge_point("c")
 			c_lat = p3[0]
 			c_long = p3[1]
 			
-			var p4 = backend.point_d()
+			var p4 = backend.get_barge_point("d")
 			d_lat = p4[0]
 			d_long = p4[1]
 			
-			var p5 = backend.point_e()
+			var p5 = backend.get_barge_point("e")
 			e_lat = p5[0]
 			e_long = p5[1]
 			
-			var p6 = backend.point_chute()
+			var p6 = backend.get_barge_point("chute")
 			chute_lat = p6[0]
 			chute_long = p6[1]
 
@@ -5472,7 +5485,7 @@ Window {
 			arrowkiridepan_target.visible = true;
 		}
 		
-		line_length.text = "line length : " + ruler_measurement.toFixed(1) + " m"	
+		line_length.text = "RULER MEASUREMENT : " + ruler_measurement.toFixed(1) + " m"	
 		
 		backend.autopilot(autopilot_button.checked)
 		

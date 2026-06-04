@@ -1034,7 +1034,13 @@ class table(QObject):
 
     def on_update_error(self, msg):
         print(f"update_data.py failed: {msg}")
+
+
+    @pyqtSlot(str, result='QVariantList')
+    def get_barge_point(self, name):
+        return list(map(float, global_points.get(name, [0, 0])))
     
+    '''
 
     @pyqtSlot(result='QVariantList')
     def point_a(self):
@@ -1070,6 +1076,9 @@ class table(QObject):
         lat_chute, long_chute = global_points["chute"]
         return [float(lat_chute), float(long_chute)]
         
+    
+    
+    '''
     
     @pyqtSlot(result=str)
     def payout_value(self):  return str(round(payout,0))
@@ -1942,10 +1951,12 @@ class table(QObject):
         global heading_magneto
         global heading_dual_gps
         global global_points
-        global lat_chute, long_chute
+        global lat_chute, backend
         
         global_points = body_to_latlon(val_latitude , val_longitude, heading_magneto, relative_points)        
         
+
+        #print (global_points)
         lat_chute, long_chute = global_points["chute"]
         #print(global_points)
         front_gps_time = time.time() - front_gps_time_prev
@@ -2105,7 +2116,7 @@ class table(QObject):
         
         
 
-      
+
        
 
         

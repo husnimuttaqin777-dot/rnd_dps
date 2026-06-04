@@ -108,6 +108,10 @@ Window {
 
 	property var fsm_data1: [];
 
+	property var satellite_order: [1]//[1, 2, 3] 
+
+	property var showRect: [true, true, true]
+
 	function toRadians(degrees) {
         return degrees * Math.PI / 180.0;
     }
@@ -208,25 +212,12 @@ Window {
 
         for(var i=0; i<currentArray.length; i++){
 
-            /*
-			console.log(
-                currentArray[i].lat,
-                currentArray[i].lon,
-                currentArray[i].dir
-            )
-			*/
-			
-
             current_sea_model.append({
                 lat: currentArray[i].lat,
                 lon: currentArray[i].lon,
                 dir: currentArray[i].dir
             })
         }
-
-
-		//wind_model.clear()
-		//windArray = backend.getWindArray()
 
     }
 
@@ -313,7 +304,7 @@ Window {
 
 
 
-                visible :pond_map.checked ? false : true
+                visible :true 
 				
 				
 				
@@ -598,18 +589,7 @@ Window {
 				
 
 		
-		Rectangle{
-			//rectangle front gps
-			x : 518
-			y : -10
-			z : 999
-			width : 165
-			height : 70
-			color : "#012340"
-			border.width : 2
-			border.color : line_color
-			}
-
+		
 
 			
 			Rectangle{
@@ -1340,7 +1320,8 @@ Window {
 		border.width : 2
 		color : "transparent"
 		border.color : line_color
-	
+		visible : true
+
 		Rectangle{
 			id : wind_layout
 			width : parent.width/8
@@ -1438,6 +1419,7 @@ Window {
 			color : "transparent"
 			border.color : line_color
 			
+			
 			Image {
 			id : speedo
 			anchors.verticalCenter: parent.verticalCenter
@@ -1463,6 +1445,10 @@ Window {
 			
 		}
 		
+		//lat long text
+
+		
+
 		Rectangle{
 			id : gps_main_layout
 			x : wind_layout.width + payout_layout.width + speed_layout.width
@@ -1471,310 +1457,394 @@ Window {
 			border.width : 2
 			color : "transparent"
 			border.color : line_color
-			
-			Image {
-			id : map_main_img	
-			x : 0
-			y: 0
-			width : parent.width/5
-			height : parent.height
-			source :"mapicon.png"
-		
-		
-			}
-			
-			Text {
-                id: latitude_position_value
-                x: map_main_img.width
-                y: 17
-                
-                color: "white"
-                text: ("100")
-                font.pixelSize: map_main_img.width/3
-                font.styleName: "Bold"
-                font.weight: Font.Bold
-				visible : !coord_format.checked
-            }
-			
-			Text {
-                id: longitude_position_value
-                x: map_main_img.width
-                y: latitude_position_value.height + latitude_position_value.y
-                
-                color: "#ffffff"
-                text: ("100")
-                font.pixelSize: map_main_img.width/3
-                font.styleName: "Bold"
-                font.weight: Font.Bold
-				visible : !coord_format.checked
-            }
-			
-			Text {
-						id : lat_long_dms_text
-						x: map_main_img.width
-						y : 17
-						text : "lat dms"
-						color: "#ffffff"
-						font.pixelSize: map_main_img.width/3
-						font.family: "Helvetica"
-						font.bold : true
-						visible : coord_format.checked
+
+			Rectangle{ 
+				id: panelContainer
+
+				anchors.centerIn: parent
+				width: parent.width
+				height: parent.height
+				
+				
+
+				    Rectangle {
+						//id: rect1
+
+						property int idx: satellite_order.indexOf(1)
+
+						visible: idx >= 0
+
+						width: parent.width
+						height: parent.height
+
+						border.width : 2
+						border.color : line_color
+
+						x: 0
+						y: idx >= 0 ? idx * parent.height : 0
+
+						color: "#012340"
+
+						Image {
+						id : map_main_img	
+						x : 0
+						y: 0
+						width : parent.width/5
+						height : parent.height
+						source :"mapicon.png"
+					
+					
+						}
+						
+						Text {
+							id: latitude_position_value
+							x: map_main_img.width
+							y: 17
+							
+							color: "white"
+							text: ("100")
+							font.pixelSize: map_main_img.width/3
+							font.styleName: "Bold"
+							font.weight: Font.Bold
+							visible : !coord_format.checked
+						}
+						
+						Text {
+							id: longitude_position_value
+							x: map_main_img.width
+							y: latitude_position_value.height + latitude_position_value.y
+							
+							color: "#ffffff"
+							text: ("100")
+							font.pixelSize: map_main_img.width/3
+							font.styleName: "Bold"
+							font.weight: Font.Bold
+							visible : !coord_format.checked
+						}
+						
+						Text {
+									id : lat_long_dms_text
+									x: map_main_img.width
+									y : 17
+									text : "lat dms"
+									color: "#ffffff"
+									font.pixelSize: map_main_img.width/3
+									font.family: "Helvetica"
+									font.bold : true
+									visible : coord_format.checked
+								}
+						
+						
+
+						Rectangle{
+							id : gps_main_indicator_layout
+							z: 999
+							x : parent.width
+							width : parent.width 
+							height : parent.height
+							border.width : 2
+							color : "#012340"
+							border.color : line_color
+							
+							
+							Image{
+							id : satellite_img
+							x : parent.width/8
+							y : parent.height/8
+							width : parent.width/6
+							height : parent.height - (parent.height/3) 
+							source : "satellite_gold.png"
+							
+							
+							Text{
+								x:parent.width + parent.width/6
+								y : 0//satellite_img.height
+								font.pixelSize : parent.height/1.1
+								text : "B"
+								color : "#e85d08"
+								font.bold : true
+								
+							}
+
+							}
+							StatusIndicator{
+								id : gps_status
+								x : (parent.width/2) - (parent.width/4)
+								//anchors.horizontalCenter: parent.horizontalCenter  
+								anchors.verticalCenter: parent.verticalCenter
+								height : parent.height - (parent.height/5)
+								width : parent.width - (parent.width/5) 
+								color : "red"
+								active : true
+							}
+					
+						
+						
+						
+
 					}
-			
-			
-		}
 		
-		Rectangle{
-			id : gps_aux_layout
-			y : parent.height
-			x : wind_layout.width + payout_layout.width + speed_layout.width
-			z: 999
-			width : parent.width/4
-			height : parent.height
-			border.width : 2
-			color : "#012340"
-			border.color : line_color
-			
-			Image {
-			x : 0
-			y: 0
-			width : parent.width/5
-			height : parent.height
-			source :"mapicon.png"
-		
-		
-			}
-			
-			Text {
-						id : lat_long_front_text
-						x : map_main_img.width
-						y : 20
-						text : "lat dms"
-						color: "#ffffff"
-						font.pixelSize: map_main_img.width/3
-						font.family: "Helvetica"
-						font.bold : true
-						//visible : coord_format.checked
+					
+					
+					}
+
+					Rectangle {
+						//id: rect2
+
+						property int idx: satellite_order.indexOf(2)
+
+						visible: idx >= 0
+
+						width: parent.width
+						height: parent.height
+
+						x: 0
+						y: idx >= 0 ? idx * parent.height : 0
+
+						color: "blue"
+
+						Rectangle{
+						id : gps_aux_layout
+						y : 0
+						x : 0
+						z: 999
+						width : gps_main_layout.width
+						height : gps_main_layout.height
+						border.width : 2
+						color : "#012340"
+						border.color : line_color
+						visible : true
+						
+						Image {
+						x : 0
+						y: 0
+						width : parent.width/5
+						height : parent.height
+						source :"mapicon.png"
+					
+					
+						}
+						
+						Text {
+									id : lat_long_front_text
+									x : map_main_img.width
+									y : 20
+									text : "lat dms"
+									color: "#ffffff"
+									font.pixelSize: map_main_img.width/3
+									font.family: "Helvetica"
+									font.bold : true
+									//visible : coord_format.checked
+								}
+								
+						
+						
+						
 					}
 					
-			
-			
-			
-		}
-		
-		Rectangle{
-			id : gps_main_indicator_layout
-			z: 999
-			x : wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width
-			width : parent.width - (wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width)
-			height : parent.height
-			border.width : 2
-			color : "#012340"
-			border.color : line_color
-			
-			Image{
-			id : satellite_img
-			x : parent.width/8
-			y : parent.height/8
-			width : parent.width/6
-			height : parent.height - (parent.height/3) 
-			source : "satellite_gold.png"
-			
-			
-			Text{
-				x:parent.width + parent.width/6
-				y : 0//satellite_img.height
-				font.pixelSize : parent.height/1.1
-				text : "B"
-				color : "#e85d08"
-				font.bold : true
 				
-			}
-
-			}
-			StatusIndicator{
-				id : gps_status
-				x : (parent.width/2) - (parent.width/4)
-				//anchors.horizontalCenter: parent.horizontalCenter  
-				anchors.verticalCenter: parent.verticalCenter
-				height : parent.height - (parent.height/5)
-				width : parent.width - (parent.width/5) 
-				color : "red"
-				active : true
-			}
-		
-			
-			
-			
-
-		}
-		
-		Rectangle{
-			id : gps_aux_indicator_layout
-			x : wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width
-			y : parent.height
-			width : parent.width - (wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width)
-			height : parent.height
-			border.width : 2
-			color : "#012340"
-			border.color : line_color
-			
-			Button {
-				id : yaw_method
-				y : parent.height
-				text : "magneto"
-				visible : false
-				z:999
-				checkable : true
-				width : 170
-				onClicked:{
-					if (yaw_method.checked == true){
-						yaw_method.text = "dual gps"
-					} else {
-						yaw_method.text = "magneto"
+						Rectangle{
+						
+						x : parent.width
+						
+						width : parent.width 
+						height : parent.height
+						border.width : 2
+						color : "#012340"
+						border.color : line_color
+						visible : true
+						
+						Button {
+							id : yaw_method
+							y : parent.height
+							text : "magneto"
+							visible : false
+							z:999
+							checkable : true
+							width : 170
+							onClicked:{
+								if (yaw_method.checked == true){
+									yaw_method.text = "dual gps"
+								} else {
+									yaw_method.text = "magneto"
+								}
+								
+							
+							}
+						
+						Button {
+							id : yaw_visualization
+							y : parent.height
+							text : "compass"
+							z:999
+							checkable : true
+							width : 170
+							visible : false
+							
+							onClicked:{
+								if (yaw_visualization.checked == true){
+									yaw_visualization.text = "CoG"
+								} else {
+									yaw_visualization.text = "compass"
+								}
+							
+							
+							
+							}
+							
+						}
+						
+						
+						
+						
+						
+						
+						}
+						
+						Image{
+						id : satellite_aux_img
+						x : parent.width/8
+						y : parent.height/8
+						width : parent.width/6
+						height : parent.height - (parent.height/3) 
+						source : "satellite.png"
+						Text{
+							x:parent.width + parent.width/6
+							y : 0//satellite_img.height
+							font.pixelSize : parent.height/1.4
+							text : "T1"
+							color : "#ffffff"
+							font.bold : true
+							
+						}
+						
+						}
+						
+						StatusIndicator{
+							id : gpsfront_status
+							x : (parent.width/2) - (parent.width/4)
+							//anchors.horizontalCenter: parent.horizontalCenter  
+							anchors.verticalCenter: parent.verticalCenter
+							height : parent.height - (parent.height/5)
+							width : parent.width - (parent.width/5) 
+							color : "red"
+							active : true
+						}
+						
+						
+						
+						
+						
+						
+						
 					}
+				
 					
+
 				
 				}
-			
-			Button {
-				id : yaw_visualization
-				y : parent.height
-				text : "compass"
-				z:999
-				checkable : true
-				width : 170
-				visible : false
-				
-				onClicked:{
-					if (yaw_visualization.checked == true){
-						yaw_visualization.text = "CoG"
-					} else {
-						yaw_visualization.text = "compass"
+
+					Rectangle {
+						
+						property int idx: satellite_order.indexOf(3)
+						visible: idx >= 0
+						width: parent.width
+						height: parent.height
+						x: 0
+						y: idx >= 0 ? idx * parent.height : 0
+						color: "transparent"
+
+
+
+						Rectangle{
+						id : gps_third_layout
+						z: 999
+						width : parent.width
+						height : parent.height
+						border.width : 2
+						color : "#012340"
+						border.color : line_color
+					
+						
+						Image {
+						x : 0
+						y: 0
+						width : parent.width/5
+						height : parent.height
+						source :"mapicon.png"
+					
+					
+						}
+
+					}
+
+					Rectangle{
+						id : gps_third_indicator_layout
+						x :  payout_layout.width 
+						
+						width : parent.width 
+						height : parent.height
+						border.width : 2
+						color : "#012340"
+						border.color : line_color
+						visible : true
+
+						Image{
+						id : satellite_third_img
+						x : parent.width/8
+						y : parent.height/8
+						width : parent.width/6
+						height : parent.height - (parent.height/3) 
+						source : "satellite.png"
+						Text{
+							x:parent.width + parent.width/6
+							y : 0//satellite_img.height
+							font.pixelSize : parent.height/1.4
+							text : "T2"
+							color : "#ffffff"
+							font.bold : true
+							
+						}
+						
+						}
+						
+						StatusIndicator{
+							id : gpsthird_status
+							x : (parent.width/2) - (parent.width/4)
+							//anchors.horizontalCenter: parent.horizontalCenter  
+							anchors.verticalCenter: parent.verticalCenter
+							height : parent.height - (parent.height/5)
+							width : parent.width - (parent.width/5) 
+							color : "red"
+							active : true
+						}
+						
+
+					
+					
+					
+						
+					
+					}
+	
+
+
 					}
 				
-				
-				
-				}
-				
+
+
 			}
-			
-			
-			
-			
-			
-			
-			}
-			
-			Image{
-			id : satellite_aux_img
-			x : parent.width/8
-			y : parent.height/8
-			width : parent.width/6
-			height : parent.height - (parent.height/3) 
-			source : "satellite.png"
-			Text{
-				x:parent.width + parent.width/6
-				y : 0//satellite_img.height
-				font.pixelSize : parent.height/1.4
-				text : "T1"
-				color : "#ffffff"
-				font.bold : true
-				
-			}
-			
-			}
-			
-			StatusIndicator{
-				id : gpsfront_status
-				x : (parent.width/2) - (parent.width/4)
-				//anchors.horizontalCenter: parent.horizontalCenter  
-				anchors.verticalCenter: parent.verticalCenter
-				height : parent.height - (parent.height/5)
-				width : parent.width - (parent.width/5) 
-				color : "red"
-				active : true
-			}
-			
-			
-			
-			
+
 			
 			
 			
 		}
+		
+		
+		
 	
-		Rectangle{
-			id : gps_third__layout
-			y : parent.height *2
-			x : wind_layout.width + payout_layout.width + speed_layout.width
-			z: 999
-			width : parent.width/4
-			height : parent.height
-			border.width : 2
-			color : "#012340"
-			border.color : line_color
-			
-			Image {
-			x : 0
-			y: 0
-			width : parent.width/5
-			height : parent.height
-			source :"mapicon.png"
-		
-		
-			}
-
-		}
 	
-		Rectangle{
-			id : gps_third_indicator_layout
-			x : wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width
-			y : parent.height * 2
-			width : parent.width - (wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width)
-			height : parent.height
-			border.width : 2
-			color : "#012340"
-			border.color : line_color
-
-
-			Image{
-			id : satellite_third_img
-			x : parent.width/8
-			y : parent.height/8
-			width : parent.width/6
-			height : parent.height - (parent.height/3) 
-			source : "satellite.png"
-			Text{
-				x:parent.width + parent.width/6
-				y : 0//satellite_img.height
-				font.pixelSize : parent.height/1.4
-				text : "T2"
-				color : "#ffffff"
-				font.bold : true
-				
-			}
-			
-			}
-			
-			StatusIndicator{
-				id : gpsthird_status
-				x : (parent.width/2) - (parent.width/4)
-				//anchors.horizontalCenter: parent.horizontalCenter  
-				anchors.verticalCenter: parent.verticalCenter
-				height : parent.height - (parent.height/5)
-				width : parent.width - (parent.width/5) 
-				color : "red"
-				active : true
-			}
-			
-
 		
-		
-		
-			
-		
-		}
 	
 	}
 	
@@ -1787,6 +1857,7 @@ Window {
 		border.width : 2
 		color : "transparent"
 		border.color : line_color
+		visible : true
 		
 		Rectangle{
 		id : compass_layout
@@ -2772,99 +2843,6 @@ Window {
 		
 		
 		
-		
-		//GARIS GARIS 
-		
-		Rectangle{
-			x: 0
-			y : 65
-			width : 1380
-			height : 3
-			color : line_color
-			visible : true
-			
-		}
-		
-		Rectangle{
-			x: 200
-			y : 0
-			width : 3
-			height : 68
-			color : line_color
-			visible : true
-			
-		}
-		
-		Rectangle{
-			x: 0
-			y : 270
-			width : 375
-			height : 3
-			color : line_color
-			visible : true
-			
-		}
-		
-		Rectangle{
-			x: 0
-			y : 665
-			width : 375
-			height : 3
-			color : line_color
-			visible : false
-			
-		}
-		
-		Rectangle{
-			x: 490
-			y : 0
-			width : 3
-			height : 68
-			color : line_color
-			visible : true
-			
-		}
-		
-		
-		Rectangle{
-			x: 620
-			y : 0
-			width : 3
-			height : 68
-			color : line_color
-			visible : true
-			
-		}
-		
-		Rectangle{
-			x: 715
-			y : 0
-			width : 3
-			height : 68
-			color : line_color
-			visible : false
-			
-		}
-
-		Rectangle{
-			x: 850
-			y : 0
-			width : 3
-			height : 68
-			color : line_color
-			visible : true
-			
-		}
-
-		Rectangle{
-			x: 375
-			y : 65
-			width : 3
-			height : 605
-			color : line_color
-			visible : true
-			
-		}
 		
 		
 		

@@ -1151,7 +1151,39 @@ Window {
 				color : "blue"
 				font.family: "Helvetica"
 				font.bold : true
-                
+            
+				
+				Button{
+				id : coord_format
+				x: 0
+				y : parent.height  
+				z : 999
+				text: "format coordinate"
+				visible : true
+				checkable: true
+				
+			Button{
+				id : line2
+				x: coord_format.width + (coord_format.width/10)
+				y : 0
+				width : 50
+				height : 45
+				text : "2"
+				checkable : true
+				visible : false
+				
+				onClicked:{
+					upload_csv()
+					backend.estimate_rpl(2)
+					line1.checked = false
+					}
+				}
+			
+			
+			}
+
+
+
             }
 		
 		Rectangle { 
@@ -1525,34 +1557,7 @@ Window {
 						//visible : coord_format.checked
 					}
 					
-			Button{
-				id : coord_format
-				x: 0
-				y : parent.height  
-				z : 999
-				text: "format coordinate"
-				visible : true
-				checkable: true
-				
-			Button{
-				id : line2
-				x: coord_format.width + (coord_format.width/10)
-				y : 0
-				width : 50
-				height : 45
-				text : "2"
-				checkable : true
-				visible : true
-				
-				onClicked:{
-					upload_csv()
-					backend.estimate_rpl(2)
-					line1.checked = false
-					}
-				}
 			
-			
-			}
 			
 			
 		}
@@ -1573,14 +1578,16 @@ Window {
 			y : parent.height/8
 			width : parent.width/6
 			height : parent.height - (parent.height/3) 
-			source : "satellite.png"
+			source : "satellite_gold.png"
+			
 			
 			Text{
-				x:0
-				y : satellite_img.height
-				font.pixelSize : parent.height/6
-				text : "MAIN GPS"
-				color : "white"
+				x:parent.width + parent.width/6
+				y : 0//satellite_img.height
+				font.pixelSize : parent.height/1.1
+				text : "B"
+				color : "#e85d08"
+				font.bold : true
 				
 			}
 
@@ -1616,6 +1623,7 @@ Window {
 				id : yaw_method
 				y : parent.height
 				text : "magneto"
+				visible : false
 				z:999
 				checkable : true
 				width : 170
@@ -1636,7 +1644,7 @@ Window {
 				z:999
 				checkable : true
 				width : 170
-				
+				visible : false
 				
 				onClicked:{
 					if (yaw_visualization.checked == true){
@@ -1666,13 +1674,13 @@ Window {
 			height : parent.height - (parent.height/3) 
 			source : "satellite.png"
 			Text{
-				anchors.horizontalCenter: parent.horizontalCenter
-				x:0
-				y : satellite_aux_img.height
+				x:parent.width + parent.width/6
+				y : 0//satellite_img.height
+				font.pixelSize : parent.height/1.4
+				text : "T1"
+				color : "#ffffff"
+				font.bold : true
 				
-				font.pixelSize : parent.height/6
-				color : "white"
-				text : "FRONT GPS"
 			}
 			
 			}
@@ -1695,6 +1703,79 @@ Window {
 			
 			
 		}
+	
+		Rectangle{
+			id : gps_third__layout
+			y : parent.height *2
+			x : wind_layout.width + payout_layout.width + speed_layout.width
+			z: 999
+			width : parent.width/4
+			height : parent.height
+			border.width : 2
+			color : "#012340"
+			border.color : line_color
+			
+			Image {
+			x : 0
+			y: 0
+			width : parent.width/5
+			height : parent.height
+			source :"mapicon.png"
+		
+		
+			}
+
+		}
+	
+		Rectangle{
+			id : gps_third_indicator_layout
+			x : wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width
+			y : parent.height * 2
+			width : parent.width - (wind_layout.width + payout_layout.width + speed_layout.width + gps_main_layout.width)
+			height : parent.height
+			border.width : 2
+			color : "#012340"
+			border.color : line_color
+
+
+			Image{
+			id : satellite_third_img
+			x : parent.width/8
+			y : parent.height/8
+			width : parent.width/6
+			height : parent.height - (parent.height/3) 
+			source : "satellite.png"
+			Text{
+				x:parent.width + parent.width/6
+				y : 0//satellite_img.height
+				font.pixelSize : parent.height/1.4
+				text : "T2"
+				color : "#ffffff"
+				font.bold : true
+				
+			}
+			
+			}
+			
+			StatusIndicator{
+				id : gpsthird_status
+				x : (parent.width/2) - (parent.width/4)
+				//anchors.horizontalCenter: parent.horizontalCenter  
+				anchors.verticalCenter: parent.verticalCenter
+				height : parent.height - (parent.height/5)
+				width : parent.width - (parent.width/5) 
+				color : "red"
+				active : true
+			}
+			
+
+		
+		
+		
+			
+		
+		}
+	
 	}
 	
 	

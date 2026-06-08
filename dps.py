@@ -253,6 +253,24 @@ barge_relative_points = {
     "chute": np.array([8, -10]),
 }
 
+tug_relative_points = {
+    "a": np.array([-3, 5]),
+    "b": np.array([0, 10]),
+    "c": np.array([3, 5]),
+    "d": np.array([3, -10]),
+    "e": np.array([-3, -10]),
+    "chute": np.array([0, 0]),
+}
+
+tug2_relative_points = {
+    "a": np.array([-3, 5]),
+    "b": np.array([0, 10]),
+    "c": np.array([3, 5]),
+    "d": np.array([3, -10]),
+    "e": np.array([-3, -10]),
+    "chute": np.array([0, 0]),
+}
+
 #lat_a = global_points[0]
 lat_a =  0
 long_a =  0
@@ -903,8 +921,17 @@ def dual_gps_heading(lat1, lon1, lat2, lon2):
 
 ########## mengisi class table dengan instruksi pyqt5#############
 #----------------------------------------------------------------#
+heading_tug = 15
+latitude_tug = 1.153154
+longitude_tug = 103.895214
+
+heading_tug2 = 270
+latitude_tug2 = 1.154024
+longitude_tug2 = 103.896222
 
 global_points = body_to_latlon(val_latitude , val_longitude, heading_magneto, barge_relative_points)        
+global_tug_points = body_to_latlon(latitude_tug , longitude_tug, heading_tug, tug_relative_points)
+global_tug2_points = body_to_latlon(latitude_tug2 , longitude_tug2, heading_tug2, tug2_relative_points)
 
 import subprocess
 
@@ -1040,9 +1067,15 @@ class table(QObject):
     def get_barge_point(self, name):
         return list(map(float, global_points.get(name, [0, 0])))
     
-    '''
     
-    '''
+    @pyqtSlot(str, result='QVariantList')
+    def get_tug_point(self, name):
+        return list(map(float, global_tug_points.get(name, [0, 0])))
+    
+    @pyqtSlot(str, result='QVariantList')
+    def get_tug2_point(self, name):
+        return list(map(float, global_tug2_points.get(name, [0, 0])))
+
     
     @pyqtSlot(result=str)
     def payout_value(self):  return str(round(payout,0))
@@ -1915,12 +1948,35 @@ class table(QObject):
         global heading_magneto
         global heading_dual_gps
         global global_points
+        global global_tug_points
+        global global_tug2_points
+
+        global latitude_tug
+        global longitude_tug
+
+        global latitude_tug2
+        global longitude_tug2
+
+        global heading_tug
+        global heading_tug2
         global lat_chute, backend
+
+        with open("position.json", "r") as file:
+            data = json.load(file)
+
+        latitude_tug = float(data["tug1"]["latitude"])
+        longitude_tug = float(data["tug1"]["longitude"])
+        heading_tug = float(data["tug1"]["heading"])
+
+        latitude_tug2 = float(data["tug2"]["latitude"])
+        longitude_tug2 = float(data["tug2"]["longitude"])
+        heading_tug2 = float(data["tug2"]["heading"])
         
         global_points = body_to_latlon(val_latitude , val_longitude, heading_magneto, barge_relative_points)        
-        
+        global_tug_points = body_to_latlon(latitude_tug , longitude_tug, heading_tug, tug_relative_points)
+        global_tug2_points = body_to_latlon(latitude_tug2, longitude_tug2, heading_tug2, tug2_relative_points)
 
-        #print (global_points)
+        print (data["tug2"])
         lat_chute, long_chute = global_points["chute"]
         #print(global_points)
         front_gps_time = time.time() - front_gps_time_prev

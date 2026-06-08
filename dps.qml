@@ -100,6 +100,44 @@ Window {
 	property real chute_long : 117.27512174731385
 
 
+	property real a_tug_lat : 1.153176
+	property real a_tug_long : 103.895208
+	
+	property real b_tug_lat : 1.153200
+	property real b_tug_long : 103.895228
+	
+	property real c_tug_lat : 1.153178
+	property real c_tug_long : 103.895245
+	
+	property real d_tug_lat : 1.153142
+	property real d_tug_long : 103.895246
+	
+	property real e_tug_lat : 1.153140
+	property real e_tug_long : 103.895217
+	
+	property real o_tug_lat : 1.153154
+	property real o_tug_long : 103.895214
+
+
+
+	property real a_tug2_lat : 1.153176
+	property real a_tug2_long : 103.895208
+	
+	property real b_tug2_lat : 1.153200
+	property real b_tug2_long : 103.895228
+	
+	property real c_tug2_lat : 1.153178
+	property real c_tug2_long : 103.895245
+	
+	property real d_tug2_lat : 1.153142
+	property real d_tug2_long : 103.895246
+	
+	property real e_tug2_lat : 1.153140
+	property real e_tug2_long : 103.895217
+	
+	property real o_tug2_lat : 1.153154
+	property real o_tug2_long : 103.895214
+
 
 	property var line_color : "#03A678"
 
@@ -110,7 +148,6 @@ Window {
 
 	property var satellite_order: [1]//[1, 2, 3] 
 
-	property var showRect: [true, true, true]
 
 	function toRadians(degrees) {
         return degrees * Math.PI / 180.0;
@@ -372,7 +409,6 @@ Window {
 					}
 			
 				//arah arus laut
-
 				MapItemView {
 				model: current_sea_model
 				delegate: Component {
@@ -1010,7 +1046,7 @@ Window {
 					]
 				}
 
-                MapCircle { 
+				MapCircle { 
 					center {
 						latitude:  chute_lat
 						longitude: chute_long
@@ -1024,6 +1060,40 @@ Window {
 					
 					
 				}
+
+
+				MapPolygon {
+					color: "grey"
+					border.color : "black"
+					border.width : 2
+					path: [
+                        
+                        {latitude: a_tug_lat, longitude : a_tug_long},
+						{latitude: b_tug_lat, longitude : b_tug_long},
+						{latitude: c_tug_lat, longitude : c_tug_long},
+						{latitude: d_tug_lat, longitude : d_tug_long},
+						{latitude: e_tug_lat, longitude : e_tug_long},
+						
+					]
+				}
+
+
+				MapPolygon {
+					color: "grey"
+					border.color : "black"
+					border.width : 2
+					path: [
+                        
+                        {latitude: a_tug2_lat, longitude : a_tug2_long},
+						{latitude: b_tug2_lat, longitude : b_tug2_long},
+						{latitude: c_tug2_lat, longitude : c_tug2_long},
+						{latitude: d_tug2_lat, longitude : d_tug2_long},
+						{latitude: e_tug2_lat, longitude : e_tug2_long},
+						
+					]
+				}
+
+                
 
                 MapCircle { 
 					center {
@@ -5357,6 +5427,51 @@ Window {
 			var p6 = backend.get_barge_point("chute")
 			chute_lat = p6[0]
 			chute_long = p6[1]
+
+			//console.log(backend.get_barge_point("a"))
+
+			var p7 = backend.get_tug_point("a")
+			a_tug_lat = p7[0]
+			a_tug_long = p7[1]
+
+			var p8 = backend.get_tug_point("b")
+			b_tug_lat = p8[0]
+			b_tug_long = p8[1]
+
+			var p9 = backend.get_tug_point("c")
+			c_tug_lat = p9[0]
+			c_tug_long = p9[1]
+
+			var p10 = backend.get_tug_point("d")
+			d_tug_lat = p10[0]
+			d_tug_long = p10[1]
+
+			var p11 = backend.get_tug_point("e")
+			e_tug_lat = p11[0]
+			e_tug_long = p11[1]
+
+			var p12 = backend.get_tug2_point("a")
+			a_tug2_lat = p12[0]
+			a_tug2_long = p12[1]
+
+			console.log(backend.get_tug2_point("a"))
+
+			var p13 = backend.get_tug2_point("b")
+			b_tug2_lat = p13[0]
+			b_tug2_long = p13[1]
+
+			var p14 = backend.get_tug2_point("c")
+			c_tug2_lat = p14[0]
+			c_tug2_long = p14[1]
+
+			var p15 = backend.get_tug2_point("d")
+			d_tug2_lat = p15[0]
+			d_tug2_long = p15[1]
+
+			var p16 = backend.get_tug2_point("e")
+			e_tug2_lat = p16[0]
+			e_tug2_long = p16[1]
+
 
 
             // Konversi to lat long > Panjang Kapal : 111000

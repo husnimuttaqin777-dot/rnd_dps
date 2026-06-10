@@ -324,7 +324,7 @@ Window {
                 anchors.topMargin: 0
                 anchors.left: parent.left
                 anchors.leftMargin: 0
-                zoomLevel : 1000.03
+                zoomLevel : 15.03
 				minimumZoomLevel: 10.03
 				maximumZoomLevel: 1000.4
                 copyrightsVisible: true
@@ -334,7 +334,7 @@ Window {
                 activeMapType: supportedMapTypes[1]
 
                 //center: QtPositioning.coordinate(latitude_position_value.text, longitude_position_value.text)
-                center: QtPositioning.coordinate(1.153461 , 103.894775)
+                center: QtPositioning.coordinate(1.1507294619859862 , 103.90762283001442)
 				//center: QtPositioning.coordinate(latitude_position_value.text, longitude_position_value.text)
 				gesture.enabled: true
                 gesture.acceptedGestures: MapGestureArea.PinchGesture | MapGestureArea.PanGesture
@@ -1063,7 +1063,7 @@ Window {
 
 
 				MapPolygon {
-					color: "grey"
+					color: "black"
 					border.color : "black"
 					border.width : 2
 					path: [
@@ -1079,7 +1079,7 @@ Window {
 
 
 				MapPolygon {
-					color: "grey"
+					color: "white"
 					border.color : "black"
 					border.width : 2
 					path: [
@@ -4157,6 +4157,7 @@ Window {
 				width : parent.width
 				height : parent.height
 				color : hardware_setting.checked ? "blue" : "gray"
+				
 			}
 
 			onClicked:{
@@ -4580,7 +4581,129 @@ Window {
 			border.color :line_color
 			visible : false
 
-			
+			Text{
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 10
+					text : " Set Steering Sensor "
+					font.pixelSize : 16
+					color : line_color
+					font.bold : true
+					font.family: "Helvetica"
+				}
+
+
+				Text{
+					x : 20
+					y : 50
+					text : "Steering Sensor 1 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering1_calib
+						x : 150
+						y : -5
+						width : 80
+					}
+
+					Button{
+						x : 250
+						y : -5
+						width : 50
+						text :"edit"
+
+						onClicked:{
+							backend.steering1_set(steering1_calib.text)
+						}
+					}
+				
+				}
+
+				Text{
+					x : 20
+					y : 90
+					text : "Steering Sensor 2 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering2_calib
+						x : 150
+						y : -5
+						width : 80
+					}
+
+					Button{
+						x : 250
+						y : -5
+						width : 50
+						text :"edit"
+
+						onClicked:{
+							backend.steering2_set(steering2_calib.text)
+						}
+					}
+				
+				}
+
+				Text{
+					x : 20
+					y : 130
+					text : "Steering Sensor 3 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering3_calib
+						x : 150
+						y : -5
+						width : 80
+					}
+
+					Button{
+						x : 250
+						y : -5
+						width : 50
+						text :"edit"
+
+						onClicked:{
+							backend.steering3_set(steering3_calib.text)
+						}
+					}
+				
+				}
+
+
+				Text{
+					x : 20
+					y : 170
+					text : "Steering Sensor 4 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering4_calib
+						x : 150
+						y : -5
+						width : 80
+					}
+
+					Button{
+						x : 250
+						y : -5
+						width : 50
+						text :"edit"
+						onClicked:{
+							backend.steering4_set(steering4_calib.text)
+						}
+					}
+				
+				}
+				
 
 
 
@@ -5428,8 +5551,6 @@ Window {
 			chute_lat = p6[0]
 			chute_long = p6[1]
 
-			//console.log(backend.get_barge_point("a"))
-
 			var p7 = backend.get_tug_point("a")
 			a_tug_lat = p7[0]
 			a_tug_long = p7[1]
@@ -5454,8 +5575,6 @@ Window {
 			a_tug2_lat = p12[0]
 			a_tug2_long = p12[1]
 
-			console.log(backend.get_tug2_point("a"))
-
 			var p13 = backend.get_tug2_point("b")
 			b_tug2_lat = p13[0]
 			b_tug2_long = p13[1]
@@ -5472,10 +5591,6 @@ Window {
 			e_tug2_lat = p16[0]
 			e_tug2_long = p16[1]
 
-
-
-            // Konversi to lat long > Panjang Kapal : 111000
-
             //kiri belakang
 			left_barge_lat = (-0 * Math.sin((360 - markerdirect.angle) * Math.PI/180) + barge_center_lat)
 			left_barge_long = (-0 * Math.cos((360 - markerdirect.angle) * Math.PI/180) + barge_center_long)
@@ -5488,15 +5603,10 @@ Window {
 			lat_barge1 = (-0.0004954 * Math.sin(((360 - markerdirect.angle) - 90) * Math.PI/180) + left_barge_lat)
 			long_barge1 = (-0.0004954 * Math.cos(((360 - markerdirect.angle) - 90) * Math.PI/180) + left_barge_long)
 
-
-            
 			//moncong
 			lat_haluan = (-0.0000585* Math.sin(((360 - markerdirect.angle) - 150) * Math.PI/180) + lat_barge1)
 			long_haluan = (-0.0000585* Math.cos(((360 - markerdirect.angle) - 150) * Math.PI/180) + long_barge1)
             
-			    //chute_lat = -0.000081 * Math.sin(((360 - markerdirect.angle) - 90) * Math.PI/180) + left_barge_lat 
-			    //chute_long = -0.000081 * Math.cos(((360 - markerdirect.angle) - 90) * Math.PI/180) + left_barge_long
-			
             // kanan depan
 			lat_barge2 = (-0.0004954 * Math.sin(((360 - markerdirect.angle) - 90) * Math.PI/180) + right_barge_lat)
 			long_barge2 = (-0.0004954 * Math.cos(((360 - markerdirect.angle) - 90) * Math.PI/180) + right_barge_long)
@@ -5529,12 +5639,6 @@ Window {
 			} else {
 				autopilot_button.checked = false
 			}
-			
-
-
-			
-			
-
 		}
 		
 		
@@ -5547,8 +5651,7 @@ Window {
 			upload_csv()
 		}
 
-		//console.log(rpl_lat.length)
-		//console.log(propeller1_position.x, propeller1_position.y)
+
 		propeller1_properties.text = propeller1_position.x //+"\n"+ propeller1_position.y
 		propeller2_properties.text = propeller2_position.x +"\n"+ propeller2_position.y
 		propeller3_properties.text = propeller3_position.x +"\n"+ propeller3_position.y
@@ -5565,8 +5668,6 @@ Window {
         latitude_position_value.text = backend.lat()
         longitude_position_value.text = backend.long()
 		
-		//console.log(latitude_position_value.text ,  longitude_position_value.text) 
-		//console.log(backend.cog())
 		if (yaw_method.checked == true){
 			backend.heading_method_setting("dual")
 		} else {
@@ -5574,17 +5675,11 @@ Window {
 		}
 		
 		if (yaw_visualization.checked == true){
-			//heading_value.text = backend.cog()
 			markerdirect.angle = backend.cog()
 		} else {
-			
-			//heading_value.text = backend.headingship()
 			markerdirect.angle = backend.headingship()
 		}
         
-        
-		//vessel1.rotation = backend.headingship()
-
         lat_target.text = backend.lat_target()
         long_target.text = backend.long_target()
 
@@ -5593,7 +5688,6 @@ Window {
         speed3.text = backend.Set_Speed3()
         speed4.text = backend.Set_Speed4()
 
-        
         arrowkiridepan.rotation = backend.steering4()
         arrowkanandepan.rotation = backend.steering1()
 		
@@ -5604,11 +5698,8 @@ Window {
 		arrowkiridepan_target.rotation = backend.steering4_target()
         arrowkanandepan_target.rotation = backend.steering1_target()
 		
-		//console.log(backend.steering1_target())
-		
         arrowkananbelakang_target.rotation = backend.steering2_target()
         arrowkiribelakang_target.rotation = backend.steering3_target()
-		//console.log(backend.central_status())
 		
 		if (backend.central_status() == "local"){
 			arrowkananbelakang_target.visible = false;
@@ -5643,18 +5734,11 @@ Window {
 			slider.interactive = false
 			slider.value = backend.headingship()
 		}
-		//slider.value = backend.heading_target()
-		
-		
-		//console.log(backend.heading_target())
+
 		compass_val.text =  "<font color='gold'>" + slider.value + "</font>"
 		
 		compass.value = backend.headingship()
 		
-
-		//gov1.color
-
-
 		gov1.color = backend.spc_indicator_color1()
 		gov2.color = backend.spc_indicator_color2()
 		gov3.color = backend.spc_indicator_color3()
@@ -5669,11 +5753,6 @@ Window {
 		
 		
 		lat_long_dms_text.text = backend.latitude_dms()+backend.lat_pole()+"\n"+ backend.longitude_dms()+backend.long_pole()
-			
-		//rpm1.text = "<font color='white'>" + backend.rpm1() + "</font>"+ "<font color='#D95204'> / </font>" + "<font color='gold'>" +backend.target_rpm1()+ "</font>\nRPM"
-		//rpm2.text = "<font color='white'>" + backend.rpm2() + "</font>"+ "<font color='#D95204'> / </font>" + "<font color='gold'>" +backend.target_rpm2()+ "</font>\nRPM"
-		//rpm3.text = "<font color='white'>" + backend.rpm3() + "</font>"+ "<font color='#D95204'> / </font>" + "<font color='gold'>" +backend.target_rpm3()+ "</font>\nRPM"
-		//rpm4.text = "<font color='white'>" + backend.rpm1() + "</font>"+ "<font color='#D95204'> / </font>" + "<font color='gold'>" +backend.target_rpm4()+ "</font>\nRPM"
 		
 		rpm1.text = "<font color='white'>" + backend.rpm1() + " RPM"
 		rpm2.text = "<font color='white'>" + backend.rpm2() + " RPM"
@@ -5689,7 +5768,6 @@ Window {
 
 		rpl_index_prev = rpl_index
 		
-
 		steering1_status.border.color = gov1.color
 		steering2_status.border.color = gov2.color
 		steering3_status.border.color = gov3.color
@@ -5748,9 +5826,7 @@ Window {
 			}
 
 			wind_attack.rotation = backend.winddirect()
-			
-			gpsfront_status.color = backend.front_gps_color()
-			
+			gpsfront_status.color = backend.front_gps_color()	
 			lat_long_front_text.text = backend.lat_front() + "\n" + backend.long_front()
 
 		}

@@ -626,11 +626,26 @@ steering3_color = "#00ff00"
 steering4_color = "#00ff00"
 
 
+
+
 steering1_sensor = 0
 steering2_sensor = 0
 steering3_sensor = 0
 steering4_sensor = 0
 
+steering1_raw = 0
+steering2_raw = 0
+steering3_raw = 0
+steering4_raw = 0
+
+
+with open("offset_steering.json", "r") as f:
+    data_steering_offset = json.load(f)
+
+steering1_offset = int(data_steering_offset["steering1_offset"])
+steering2_offset = int(data_steering_offset["steering2_offset"])
+steering3_offset = int(data_steering_offset["steering3_offset"])
+steering4_offset = int(data_steering_offset["steering4_offset"])
 
 heading_first = ""
 
@@ -1739,6 +1754,44 @@ class table(QObject):
 
 
 
+    @pyqtSlot('int')
+    def steering1_set(self, value):
+        global steering1_set
+        global data_steering_offset
+        steering1_set = value
+        data_steering_offset["steering1_offset"] =  int(steering1_set - steering1_raw)
+        print(int(steering1_set - steering1_sensor))
+        with open("offset_steering.json", "w") as f:
+            json.dump(data_steering_offset, f, indent=4)
+
+    @pyqtSlot('int')
+    def steering2_set(self, value):
+        global steering2_set
+        global data_steering_offset
+        steering2_set = value
+        data_steering_offset["steering2_offset"] =  int(steering2_set - steering2_raw)
+        with open("offset_steering.json", "w") as f:
+            json.dump(data_steering_offset, f, indent=4)
+
+
+    @pyqtSlot('int')
+    def steering3_set(self, value):
+        global steering3_set
+        global data_steering_offset
+        steering3_set = value
+        data_steering_offset["steering3_offset"] =  int(steering3_set - steering3_raw)
+        with open("offset_steering.json", "w") as f:
+            json.dump(data_steering_offset, f, indent=4)
+
+    @pyqtSlot('int')
+    def steering4_set(self, value):
+        global steering4_set
+        global data_steering_offset
+        steering4_set = value
+        data_steering_offset["steering4_offset"] =  int(steering4_set - steering4_raw)
+        with open("offset_steering.json", "w") as f:
+            json.dump(data_steering_offset, f, indent=4)
+
 #----------------------------------------------------------------#
     @pyqtSlot(str)
     def tick(self, value):
@@ -1960,6 +2013,9 @@ class table(QObject):
         global heading_tug
         global heading_tug2
         global lat_chute, backend
+        global steering1_offset, steering2_offset, steering3_offset, steering4_offset, steering1_sensor, steering2_sensor, steering3_sensor, steering4_sensor
+        global data_steering_offset
+
 
         with open("position.json", "r") as file:
             data = json.load(file)
@@ -1976,9 +2032,7 @@ class table(QObject):
         global_tug_points = body_to_latlon(latitude_tug , longitude_tug, heading_tug, tug_relative_points)
         global_tug2_points = body_to_latlon(latitude_tug2, longitude_tug2, heading_tug2, tug2_relative_points)
 
-        print (data["tug2"])
         lat_chute, long_chute = global_points["chute"]
-        #print(global_points)
         front_gps_time = time.time() - front_gps_time_prev
         if (front_gps_time < 5):
             front_gps_color = "green"
@@ -1986,6 +2040,22 @@ class table(QObject):
         else :
             front_gps_color = "red"
         
+
+        with open("offset_steering.json", "r") as f:
+            data_steering_offset = json.load(f)
+
+        steering1_offset = int(data_steering_offset["steering1_offset"])
+        steering2_offset = int(data_steering_offset["steering2_offset"])
+        steering3_offset = int(data_steering_offset["steering3_offset"])
+        steering4_offset = int(data_steering_offset["steering4_offset"])
+
+
+        steering1_sensor =  map_angle_with_offset((steering1_raw),0, 360, 0, 360, steering1_offset) 
+        steering2_sensor = map_angle_with_offset((steering2_raw),0, 360, 0, 360, steering2_offset)
+        steering3_sensor = map_angle_with_offset((steering3_raw),0, 360, 0, 360, steering3_offset) 
+        steering4_sensor = map_angle_with_offset((steering4_raw),0, 360, 0, 360, steering4_offset)  
+
+
 
 
         joystick2_time = time.time() - joystick2_time_prev
@@ -2133,12 +2203,8 @@ class table(QObject):
         y_error = abs(round(float(error_body_fixed[1]),0))
         
         y_ref = np.array([x_error, y_error, heading]).reshape(-1, 1)
-        
-        
 
-
-       
-
+    
         
         control_prop = str(str("ṅ : ")+str(n_dot)+str("\nė : ")+str(e_dot)+str("\nψ_dot : ") + str(psi_dot)
                         +str("\nẋ : ")+str(x_dot)+ str("\nẏ : ")+str(y_dot) + str("\nn_error : ")+str(n_error)
@@ -2210,10 +2276,6 @@ class table(QObject):
             speed_measurement_time_prev = time.time()
 
 
-
-        
-
-
 def on_message(client, userdata, message):
     global gps_time_prev
     global gps_aux_time_prev
@@ -2229,29 +2291,41 @@ def on_message(client, userdata, message):
     if (t == "payout"):
         global payout
         payout = float(msg) 
-        #print(steering1_sensor)
+        
 
     if (t == "steering1_sensor"):
         global steering1_sensor
+        global steering1_raw
+        global steering1_offset
         global spc_message_time_prev
         spc_message_time_prev = time.time()
-        steering1_sensor = float(msg)
-        #print(steering1_sensor)
+        steering1_raw = (float(msg))
+        
+        
         
 
     if (t == "steering2_sensor"):
         global steering2_sensor
+        global steering2_raw
+        global steering2_offset
         global gyro_message_time_prev
-        steering2_sensor = float(msg)
+        steering2_raw = float(msg)
+        
         gyro_message_time_prev = time.time()
 
     if (t == "steering3_sensor"):
         global steering3_sensor
-        steering3_sensor = float(msg)
+        global steering3_raw
+        global steering3_offset
+        steering3_raw = float(msg)
+        
 
     if (t == "steering4_sensor"):
         global steering4_sensor
-        steering4_sensor = float(msg)
+        global steering4_raw
+        global steering4_offset
+        steering4_raw = float(msg)
+        
 
     if (t == "SPC1"):
         global SP1
@@ -2388,9 +2462,6 @@ def on_message(client, userdata, message):
         global pitch
 
         pitch = float(msg)
-
-
-        
 
     if (t == "pitch_pontoon"):
         global roll

@@ -59,7 +59,7 @@ print(str(serial_ports()))
 
 port = input("write port : ")
 
-ser = serial.Serial(port, 9600)
+ser = serial.Serial(port, 4800)
 
 
 broker = input("broker ip: ")
@@ -172,7 +172,7 @@ def on_message(client, userdata, message):
         val = (msg)
         
         
-if _name_ == "_main_":
+if __name__ == "__main__":
     ##Mosquitto Mqtt Configuration
     client= paho.Client("NMEA_GPS_PC")
     client.on_message=on_message

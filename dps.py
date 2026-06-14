@@ -647,6 +647,11 @@ steering2_offset = int(data_steering_offset["steering2_offset"])
 steering3_offset = int(data_steering_offset["steering3_offset"])
 steering4_offset = int(data_steering_offset["steering4_offset"])
 
+steering_raw_min = data_steering_offset["steering_raw_min"]
+steering_raw_max = data_steering_offset["steering_raw_max"]
+
+print("steering",steering_raw_min[0])
+
 heading_first = ""
 
 speed_button = 0
@@ -1792,6 +1797,33 @@ class table(QObject):
         with open("offset_steering.json", "w") as f:
             json.dump(data_steering_offset, f, indent=4)
 
+
+    @pyqtSlot(int, int, int, int)
+    def steering_min(self, val1, val2, val3, val4):
+        global steering_raw_min
+
+        data_baru = [val1, val2, val3, val4]
+
+        for i, val in enumerate(data_baru):
+            if val != "":
+                steering_raw_min[i] = int(val)
+
+        print(steering_raw_min)
+
+    
+    @pyqtSlot(int, int, int, int)
+    def steering_max(self, val1, val2, val3, val4):
+        global steering_raw_max
+
+        data_baru = [val1, val2, val3, val4]
+
+        for i, val in enumerate(data_baru):
+            if val != "":
+                steering_raw_max[i] = int(val)
+
+        print(steering_raw_max)
+    
+
 #----------------------------------------------------------------#
     @pyqtSlot(str)
     def tick(self, value):
@@ -2049,7 +2081,7 @@ class table(QObject):
         steering3_offset = int(data_steering_offset["steering3_offset"])
         steering4_offset = int(data_steering_offset["steering4_offset"])
 
-
+        #map_angle_with_offset(nilai raw, nilai min, nilai max, target min, target max, offset)
         steering1_sensor =  map_angle_with_offset((steering1_raw),0, 360, 0, 360, steering1_offset) 
         steering2_sensor = map_angle_with_offset((steering2_raw),0, 360, 0, 360, steering2_offset)
         steering3_sensor = map_angle_with_offset((steering3_raw),0, 360, 0, 360, steering3_offset) 
@@ -2228,6 +2260,12 @@ class table(QObject):
             client.publish("steer2_command", str(str2_target))
             client.publish("steer3_command", str(str3_target))
             client.publish("steer4_command", str(str4_target))
+
+            client.publish("steering1_calibrated", str(steering1_sensor))
+            client.publish("steering2_calibrated", str(steering2_sensor))
+            client.publish("steering3_calibrated", str(steering3_sensor))
+            client.publish("steering4_calibrated", str(steering4_sensor))
+
 
             client.publish("user_control", str(user_control))
             client.publish("yaw_barge", str(heading_magneto))

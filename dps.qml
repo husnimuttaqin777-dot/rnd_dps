@@ -4607,18 +4607,75 @@ Window {
 						width : 80
 					}
 
+					
+				
+				
+				Text{
+					x : 250
+
+					text : "min : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering1_min
+						x : 50
+						y : -5
+						width : 80
+					}
+				
+				}
+
+				Text{
+					x : 390
+
+					text : "max : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering1_max
+						x : 50
+						y : -5
+						width : 80
+					}
+
 					Button{
-						x : 250
+						x : 130
 						y : -5
 						width : 50
 						text :"edit"
 
 						onClicked:{
-							backend.steering1_set(steering1_calib.text)
+							//backend.steering1_set(steering1_calib.text)
+							if (steering1_calib.text != "" && /^\d+(\.\d+)?$/.test(steering1_calib.text)){
+								backend.steering1_set(steering1_calib.text)
+							}
+
+							else{
+								console.log("empty ")
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering1_min.text)){
+								backend.steering_min(steering1_min.text, '','','')
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering1_max.text)){
+								backend.steering_max(steering1_max.text, '','','')
+							}
+							
 						}
 					}
 				
 				}
+
+				
+				
+				
+				}
+
 
 				Text{
 					x : 20
@@ -4635,16 +4692,70 @@ Window {
 						width : 80
 					}
 
+					
+
+
+					Text{
+					x : 250
+
+					text : "min : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering2_min
+						x : 50
+						y : -5
+						width : 80
+					}
+				
+				}
+
+				Text{
+					x : 390
+
+					text : "max : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering2_max
+						x : 50
+						y : -5
+						width : 80
+					}
+
 					Button{
-						x : 250
+						x : 130
 						y : -5
 						width : 50
 						text :"edit"
 
 						onClicked:{
-							backend.steering2_set(steering2_calib.text)
+							if (steering2_calib.text != "" && /^\d+(\.\d+)?$/.test(steering2_calib.text)){
+								backend.steering2_set(steering2_calib.text)
+							}
+
+							else{
+								console.log("empty ")
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering2_min.text)){
+								backend.steering_min('',steering2_min.text,'','')
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering2_max.text)){
+								backend.steering_max('',steering2_max.text, '','')
+							}
+							
 						}
 					}
+				
+				}
+
+				
 				
 				}
 
@@ -4663,16 +4774,70 @@ Window {
 						width : 80
 					}
 
+					
+
+
+					Text{
+					x : 250
+
+					text : "min : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering3_min
+						x : 50
+						y : -5
+						width : 80
+					}
+				
+				}
+
+				Text{
+					x : 390
+
+					text : "max : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering3_max
+						x : 50
+						y : -5
+						width : 80
+					}
+
 					Button{
-						x : 250
+						x : 130
 						y : -5
 						width : 50
 						text :"edit"
 
 						onClicked:{
-							backend.steering3_set(steering3_calib.text)
+							if (steering3_calib.text != "" && /^\d+(\.\d+)?$/.test(steering3_calib.text)){
+								backend.steering3_set(steering3_calib.text)
+							}
+
+							else{
+								console.log("empty ")
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering3_min.text)){
+								backend.steering_min('','',steering3_min.text,'')
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering3_max.text)){
+								backend.steering_max('','',steering3_max.text,'')
+							}
+							
 						}
 					}
+				
+				}
+
+				
 				
 				}
 
@@ -4692,20 +4857,82 @@ Window {
 						width : 80
 					}
 
+					
+
+
+					Text{
+					x : 250
+
+					text : "min : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering4_min
+						x : 50
+						y : -5
+						width : 80
+					}
+				
+				}
+
+				Text{
+					x : 390
+
+					text : "max : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : steering4_max
+						x : 50
+						y : -5
+						width : 80
+					}
+
 					Button{
-						x : 250
+						x : 130
 						y : -5
 						width : 50
 						text :"edit"
+
 						onClicked:{
-							backend.steering4_set(steering4_calib.text)
+							if (steering4_calib.text != "" && /^\d+(\.\d+)?$/.test(steering4_calib.text)){
+								backend.steering3_set(steering4_calib.text)
+							}
+
+							else{
+								console.log("empty ")
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering4_min.text)){
+								backend.steering_min('',steering4_min.text,'','')
+							}
+
+							if (/^\d+(\.\d+)?$/.test(steering4_max.text)){
+								backend.steering_max('',steering4_max.text, '','')
+							}
 						}
 					}
 				
 				}
+
+				
+				
+				}
 				
 
-
+			Text{
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 210
+					text : " Set Thruster Characteristic "
+					font.pixelSize : 16
+					color : line_color
+					font.bold : true
+					font.family: "Helvetica"
+				}
 
 
 		}

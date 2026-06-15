@@ -1,6 +1,6 @@
 {
-    "steering1_offset": 23,
-    "steering2_offset": 3,
+    "steering1_offset": 0,
+    "steering2_offset": 0,
     "steering3_offset": 0,
     "steering4_offset": 0,
     "steering_raw_min": [
@@ -10,9 +10,9 @@
         0
     ],
     "steering_raw_max": [
-        360,
-        360,
         355,
+        360,
+        360,
         355
     ]
 }

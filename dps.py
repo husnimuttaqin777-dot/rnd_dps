@@ -1798,7 +1798,7 @@ class table(QObject):
             json.dump(data_steering_offset, f, indent=4)
 
 
-    @pyqtSlot(int, int, int, int)
+    @pyqtSlot(str, str, str, str)
     def steering_min(self, val1, val2, val3, val4):
         global steering_raw_min
 
@@ -1808,10 +1808,14 @@ class table(QObject):
             if val != "":
                 steering_raw_min[i] = int(val)
 
-        print(steering_raw_min)
+        print("steering_raw_min", steering_raw_min)
+        
+        data_steering_offset["steering_raw_min"] =  steering_raw_min
+        with open("offset_steering.json", "w") as f:
+            json.dump(data_steering_offset, f, indent=4)
 
     
-    @pyqtSlot(int, int, int, int)
+    @pyqtSlot(str, str, str, str)
     def steering_max(self, val1, val2, val3, val4):
         global steering_raw_max
 
@@ -1821,7 +1825,10 @@ class table(QObject):
             if val != "":
                 steering_raw_max[i] = int(val)
 
-        print(steering_raw_max)
+        print("steering_raw_max", steering_raw_max)
+        data_steering_offset["steering_raw_max"] =  steering_raw_max
+        with open("offset_steering.json", "w") as f:
+            json.dump(data_steering_offset, f, indent=4)
     
 
 #----------------------------------------------------------------#
@@ -2082,11 +2089,10 @@ class table(QObject):
         steering4_offset = int(data_steering_offset["steering4_offset"])
 
         #map_angle_with_offset(nilai raw, nilai min, nilai max, target min, target max, offset)
-        steering1_sensor =  map_angle_with_offset((steering1_raw),0, 360, 0, 360, steering1_offset) 
-        steering2_sensor = map_angle_with_offset((steering2_raw),0, 360, 0, 360, steering2_offset)
-        steering3_sensor = map_angle_with_offset((steering3_raw),0, 360, 0, 360, steering3_offset) 
-        steering4_sensor = map_angle_with_offset((steering4_raw),0, 360, 0, 360, steering4_offset)  
-
+        steering1_sensor =  map_angle_with_offset((steering1_raw),steering_raw_min[0], steering_raw_max[0], 0, 360, steering1_offset) 
+        steering2_sensor =  map_angle_with_offset((steering2_raw),steering_raw_min[1], steering_raw_max[1], 0, 360, steering2_offset)
+        steering3_sensor =  map_angle_with_offset((steering3_raw),steering_raw_min[2], steering_raw_max[2], 0, 360, steering3_offset) 
+        steering4_sensor =  map_angle_with_offset((steering4_raw),steering_raw_min[3], steering_raw_max[3], 0, 360, steering4_offset)  
 
 
 
@@ -2506,19 +2512,19 @@ def on_message(client, userdata, message):
         roll = float(msg)
 
       
-    if (t == 'rpm1'):
+    if (t == 'rpm_propeller1'):
         global rpm1
         rpm1 = float(msg)
             
-    if (t == 'rpm2'):
+    if (t == 'rpm_propeller2'):
         global rpm2
         rpm2 = float(msg)
             
-    if (t == 'rpm3'):
+    if (t == 'rpm_propeller3'):
         global rpm3
         rpm3 = float(msg)
             
-    if (t == 'rpm4'):
+    if (t == 'rpm_propeller4'):
         global rpm4
         rpm4 = float(msg)
         #print(rpm4)
@@ -2597,8 +2603,6 @@ def on_message(client, userdata, message):
 ########## memanggil class table di mainloop######################
 #----------------------------------------------------------------#    
 if __name__ == "__main__":
-
-
     
     ##Mosquitto Mqtt Configuration
     client= paho.Client("DPS_GUI")
@@ -2638,18 +2642,15 @@ if __name__ == "__main__":
     client.subscribe("steering3_sensor")
     client.subscribe("steering4_sensor")
 
-    
-
-
     client.subscribe("SPC1")
     client.subscribe("SPC2")
     client.subscribe("SPC3")
     client.subscribe("SPC4")
     
-    client.subscribe("rpm1")
-    client.subscribe("rpm2")
-    client.subscribe("rpm3")
-    client.subscribe("rpm4")
+    client.subscribe("rpm_propeller1")
+    client.subscribe("rpm_propeller2")
+    client.subscribe("rpm_propeller3")
+    client.subscribe("rpm_propeller4")
 
     client.subscribe("GPS/lat")
     client.subscribe("GPS/long")
@@ -2696,7 +2697,6 @@ if __name__ == "__main__":
     client.subscribe("steer3_command")
     client.subscribe("steer4_command")
     
-    
     client.subscribe("steer1_req")
     client.subscribe("steer2_req")
     client.subscribe("steer3_req")
@@ -2709,13 +2709,8 @@ if __name__ == "__main__":
     
     client.subscribe("payout")
     
-    
-        
     client.publish("MainControl", "active")#publish
     client.publish("dummyval", str(0))
-    
-    
-
     
 
     main = table()

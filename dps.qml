@@ -4774,9 +4774,6 @@ Window {
 						width : 80
 					}
 
-					
-
-
 					Text{
 					x : 250
 
@@ -4900,7 +4897,7 @@ Window {
 
 						onClicked:{
 							if (steering4_calib.text != "" && /^\d+(\.\d+)?$/.test(steering4_calib.text)){
-								backend.steering3_set(steering4_calib.text)
+								backend.steering4_set(steering4_calib.text)
 							}
 
 							else{
@@ -4908,19 +4905,16 @@ Window {
 							}
 
 							if (/^\d+(\.\d+)?$/.test(steering4_min.text)){
-								backend.steering_min('',steering4_min.text,'','')
+								backend.steering_min('','','',steering4_min.text)
 							}
 
 							if (/^\d+(\.\d+)?$/.test(steering4_max.text)){
-								backend.steering_max('',steering4_max.text, '','')
+								backend.steering_max('','','',steering4_max.text)
 							}
 						}
 					}
 				
 				}
-
-				
-				
 				}
 				
 

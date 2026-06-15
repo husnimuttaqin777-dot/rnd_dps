@@ -1161,7 +1161,7 @@ class table(QObject):
     
 
     @pyqtSlot(result=float)
-    def steering1(self):  return steering1_sensor
+    def steering1(self):  return round(steering1_sensor,0)
 
     @pyqtSlot(result=float)
     def steering2(self):  return steering2_sensor
@@ -1170,7 +1170,7 @@ class table(QObject):
     def steering3(self):  return steering3_sensor
 
     @pyqtSlot(result=float)
-    def steering4(self):  return steering4_sensor
+    def steering4(self):  return round(steering4_sensor,0)
 
     @pyqtSlot(result=float)
     def power(self):  return power

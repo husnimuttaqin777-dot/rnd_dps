@@ -4149,7 +4149,7 @@ Window {
 			id : hardware_setting
 			x : 152
 			y: 30
-			text : "Hardware_setting"
+			text : "Engine Sensor"
 			checked : false
 			checkable : true
 
@@ -4179,7 +4179,7 @@ Window {
 			id : control_type
 			x : 284
 			y: 30
-			text : "Control Type"
+			text : "Propeller"
 			checked : false
 			checkable : true
 
@@ -4931,7 +4931,7 @@ Window {
 
 			Text{
 					//anchors.horizontalCenter: parent.horizontalCenter
-					x : 250
+					x : 200
 					y : 230
 					text : "RPM Sensor Scale"
 					font.pixelSize : 16
@@ -4958,6 +4958,24 @@ Window {
 
 				}
 
+				Text{
+					x : 200
+					y : 260
+
+					text : "scale 1 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : scale1
+						x : 50
+						y : -5
+						width : 80
+					}
+
+				}
+
 
 
 				Text{
@@ -4971,6 +4989,27 @@ Window {
 				
 					TextField{
 						id : filter2
+						x : 50
+						y : -5
+						width : 80
+					}
+
+
+					
+
+				}
+
+				Text{
+					x : 200
+					y : 290
+
+					text : "scale 2 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : scale2
 						x : 50
 						y : -5
 						width : 80
@@ -4995,7 +5034,28 @@ Window {
 						width : 80
 					}
 
+
+					
 				}
+
+				Text{
+					x : 200
+					y : 320
+
+					text : "scale 3 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : scale3
+						x : 50
+						y : -5
+						width : 80
+					}
+
+				}
+
 
 
 				Text{
@@ -5014,7 +5074,28 @@ Window {
 						width : 80
 					}
 
+
+					
 				}
+
+				Text{
+					x : 200
+					y : 350
+
+					text : "scale 4 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : scale4
+						x : 50
+						y : -5
+						width : 80
+					}
+
+				}
+
 
 
 		}

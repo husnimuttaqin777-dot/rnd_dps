@@ -442,11 +442,11 @@ void loop() {
       boot = 1;
     }
 
-    if ((analog1-analog1_prev) < -75){
+    if ((analog1-analog1_prev) < -45){
       zone1 = zone1 + 1;
     }
 
-    if ((analog1-analog1_prev) > 75){
+    if ((analog1-analog1_prev) > 45){
       zone1 = zone1 - 1;
     }
     if (zone1 > 3){

@@ -439,11 +439,11 @@ void loop() {
       boot = 1;
     }
 
-    if ((analog1-analog1_prev) < -75){
+    if ((analog1-analog1_prev) < -45){
       zone1 = zone1 + 1;
     }
 
-    if ((analog1-analog1_prev) > 75){
+    if ((analog1-analog1_prev) > 45){
       zone1 = zone1 - 1;
     }
     if (zone1 > 3){
@@ -524,7 +524,8 @@ void loop() {
 
     Serial.print(" pot2  = ");
     Serial.print(analog2);
-
+    
+    
     Serial.print(" zone1 ");
     Serial.print(zone1);
 
@@ -533,6 +534,7 @@ void loop() {
 
     Serial.println();
     */
+    
     lcd.setCursor(0,2);
     lcd.print("PLC: V ");
 

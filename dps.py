@@ -639,7 +639,7 @@ steering3_raw = 0
 steering4_raw = 0
 
 
-with open("offset_steering.json", "r") as f:
+with open("calib_param.json", "r") as f:
     data_steering_offset = json.load(f)
 
 steering1_offset = int(data_steering_offset["steering1_offset"])
@@ -1766,7 +1766,7 @@ class table(QObject):
         steering1_set = value
         data_steering_offset["steering1_offset"] =  int(steering1_set - steering1_raw)
         print(int(steering1_set - steering1_sensor))
-        with open("offset_steering.json", "w") as f:
+        with open("calib_param.json", "w") as f:
             json.dump(data_steering_offset, f, indent=4)
 
     @pyqtSlot('int')
@@ -1775,7 +1775,7 @@ class table(QObject):
         global data_steering_offset
         steering2_set = value
         data_steering_offset["steering2_offset"] =  int(steering2_set - steering2_raw)
-        with open("offset_steering.json", "w") as f:
+        with open("calib_param.json", "w") as f:
             json.dump(data_steering_offset, f, indent=4)
 
 
@@ -1785,7 +1785,7 @@ class table(QObject):
         global data_steering_offset
         steering3_set = value
         data_steering_offset["steering3_offset"] =  int(steering3_set - steering3_raw)
-        with open("offset_steering.json", "w") as f:
+        with open("calib_param.json", "w") as f:
             json.dump(data_steering_offset, f, indent=4)
 
     @pyqtSlot('int')
@@ -1794,7 +1794,7 @@ class table(QObject):
         global data_steering_offset
         steering4_set = value
         data_steering_offset["steering4_offset"] =  int(steering4_set - steering4_raw)
-        with open("offset_steering.json", "w") as f:
+        with open("calib_param.json", "w") as f:
             json.dump(data_steering_offset, f, indent=4)
 
 
@@ -1811,7 +1811,7 @@ class table(QObject):
         print("steering_raw_min", steering_raw_min)
         
         data_steering_offset["steering_raw_min"] =  steering_raw_min
-        with open("offset_steering.json", "w") as f:
+        with open("calib_param.json", "w") as f:
             json.dump(data_steering_offset, f, indent=4)
 
     
@@ -1827,7 +1827,7 @@ class table(QObject):
 
         print("steering_raw_max", steering_raw_max)
         data_steering_offset["steering_raw_max"] =  steering_raw_max
-        with open("offset_steering.json", "w") as f:
+        with open("calib_param.json", "w") as f:
             json.dump(data_steering_offset, f, indent=4)
     
 
@@ -2080,7 +2080,7 @@ class table(QObject):
             front_gps_color = "red"
         
 
-        with open("offset_steering.json", "r") as f:
+        with open("calib_param.json", "r") as f:
             data_steering_offset = json.load(f)
 
         steering1_offset = int(data_steering_offset["steering1_offset"])

@@ -4919,13 +4919,101 @@ Window {
 				
 
 			Text{
-					anchors.horizontalCenter: parent.horizontalCenter
-					y : 210
-					text : " Set Thruster Characteristic "
+					//anchors.horizontalCenter: parent.horizontalCenter
+					x : 10
+					y : 230
+					text : "RPM Sensor Filter"
 					font.pixelSize : 16
 					color : line_color
 					font.bold : true
 					font.family: "Helvetica"
+				}
+
+			Text{
+					//anchors.horizontalCenter: parent.horizontalCenter
+					x : 250
+					y : 230
+					text : "RPM Sensor Scale"
+					font.pixelSize : 16
+					color : line_color
+					font.bold : true
+					font.family: "Helvetica"
+				}
+
+				Text{
+					x : 10
+					y : 260
+
+					text : "filter 1 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : filter1
+						x : 50
+						y : -5
+						width : 80
+					}
+
+				}
+
+
+
+				Text{
+					x : 10
+					y : 290
+
+					text : "filter 2 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : filter2
+						x : 50
+						y : -5
+						width : 80
+					}
+
+				}
+
+
+				Text{
+					x : 10
+					y : 320
+
+					text : "filter 3 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : filter3
+						x : 50
+						y : -5
+						width : 80
+					}
+
+				}
+
+
+				Text{
+					x : 10
+					y : 350
+
+					text : "filter 4 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					TextField{
+						id : filter4
+						x : 50
+						y : -5
+						width : 80
+					}
+
 				}
 
 

@@ -337,7 +337,7 @@ max_aggresivity_value = 2
 min_thruster = 0
 max_thruster = 1000
 
-
+rpm_filter = [1,1,1,1]
 
 
 S1 = 0
@@ -640,17 +640,21 @@ steering4_raw = 0
 
 
 with open("calib_param.json", "r") as f:
-    data_steering_offset = json.load(f)
+    calib_param = json.load(f)
 
-steering1_offset = int(data_steering_offset["steering1_offset"])
-steering2_offset = int(data_steering_offset["steering2_offset"])
-steering3_offset = int(data_steering_offset["steering3_offset"])
-steering4_offset = int(data_steering_offset["steering4_offset"])
+steering1_offset = int(calib_param["steering1_offset"])
+steering2_offset = int(calib_param["steering2_offset"])
+steering3_offset = int(calib_param["steering3_offset"])
+steering4_offset = int(calib_param["steering4_offset"])
 
-steering_raw_min = data_steering_offset["steering_raw_min"]
-steering_raw_max = data_steering_offset["steering_raw_max"]
+steering_raw_min = calib_param["steering_raw_min"]
+steering_raw_max = calib_param["steering_raw_max"]
 
-print("steering",steering_raw_min[0])
+rpm_filter = calib_param["rpm_filter"]
+
+
+
+print("rpm_filter",rpm_filter)
 
 heading_first = ""
 
@@ -1127,16 +1131,16 @@ class table(QObject):
     
    
     @pyqtSlot(result=float)
-    def rpm1(self):  return rpm1
+    def rpm1(self):  return round(rpm1,1)
     
     @pyqtSlot(result=float)
-    def rpm2(self):  return rpm2
+    def rpm2(self):  return round(rpm2, 1)
     
     @pyqtSlot(result=float)
-    def rpm3(self):  return rpm3
+    def rpm3(self):  return round(rpm3,1)
     
     @pyqtSlot(result=float)
-    def rpm4(self):  return rpm4
+    def rpm4(self):  return round(rpm4,1)
     
     
     @pyqtSlot(result=str)
@@ -1762,40 +1766,40 @@ class table(QObject):
     @pyqtSlot('int')
     def steering1_set(self, value):
         global steering1_set
-        global data_steering_offset
+        global calib_param
         steering1_set = value
-        data_steering_offset["steering1_offset"] =  int(steering1_set - steering1_raw)
+        calib_param["steering1_offset"] =  int(steering1_set - steering1_raw)
         print(int(steering1_set - steering1_sensor))
         with open("calib_param.json", "w") as f:
-            json.dump(data_steering_offset, f, indent=4)
+            json.dump(calib_param, f, indent=4)
 
     @pyqtSlot('int')
     def steering2_set(self, value):
         global steering2_set
-        global data_steering_offset
+        global calib_param
         steering2_set = value
-        data_steering_offset["steering2_offset"] =  int(steering2_set - steering2_raw)
+        calib_param["steering2_offset"] =  int(steering2_set - steering2_raw)
         with open("calib_param.json", "w") as f:
-            json.dump(data_steering_offset, f, indent=4)
+            json.dump(calib_param, f, indent=4)
 
 
     @pyqtSlot('int')
     def steering3_set(self, value):
         global steering3_set
-        global data_steering_offset
+        global calib_param
         steering3_set = value
-        data_steering_offset["steering3_offset"] =  int(steering3_set - steering3_raw)
+        calib_param["steering3_offset"] =  int(steering3_set - steering3_raw)
         with open("calib_param.json", "w") as f:
-            json.dump(data_steering_offset, f, indent=4)
+            json.dump(calib_param, f, indent=4)
 
     @pyqtSlot('int')
     def steering4_set(self, value):
         global steering4_set
-        global data_steering_offset
+        global calib_param
         steering4_set = value
-        data_steering_offset["steering4_offset"] =  int(steering4_set - steering4_raw)
+        calib_param["steering4_offset"] =  int(steering4_set - steering4_raw)
         with open("calib_param.json", "w") as f:
-            json.dump(data_steering_offset, f, indent=4)
+            json.dump(calib_param, f, indent=4)
 
 
     @pyqtSlot(str, str, str, str)
@@ -1810,9 +1814,9 @@ class table(QObject):
 
         print("steering_raw_min", steering_raw_min)
         
-        data_steering_offset["steering_raw_min"] =  steering_raw_min
+        calib_param["steering_raw_min"] =  steering_raw_min
         with open("calib_param.json", "w") as f:
-            json.dump(data_steering_offset, f, indent=4)
+            json.dump(calib_param, f, indent=4)
 
     
     @pyqtSlot(str, str, str, str)
@@ -1826,9 +1830,9 @@ class table(QObject):
                 steering_raw_max[i] = int(val)
 
         print("steering_raw_max", steering_raw_max)
-        data_steering_offset["steering_raw_max"] =  steering_raw_max
+        calib_param["steering_raw_max"] =  steering_raw_max
         with open("calib_param.json", "w") as f:
-            json.dump(data_steering_offset, f, indent=4)
+            json.dump(calib_param, f, indent=4)
     
 
 #----------------------------------------------------------------#
@@ -2053,7 +2057,7 @@ class table(QObject):
         global heading_tug2
         global lat_chute, backend
         global steering1_offset, steering2_offset, steering3_offset, steering4_offset, steering1_sensor, steering2_sensor, steering3_sensor, steering4_sensor
-        global data_steering_offset
+        global calib_param
 
 
         with open("position.json", "r") as file:
@@ -2081,12 +2085,12 @@ class table(QObject):
         
 
         with open("calib_param.json", "r") as f:
-            data_steering_offset = json.load(f)
+            calib_param = json.load(f)
 
-        steering1_offset = int(data_steering_offset["steering1_offset"])
-        steering2_offset = int(data_steering_offset["steering2_offset"])
-        steering3_offset = int(data_steering_offset["steering3_offset"])
-        steering4_offset = int(data_steering_offset["steering4_offset"])
+        steering1_offset = int(calib_param["steering1_offset"])
+        steering2_offset = int(calib_param["steering2_offset"])
+        steering3_offset = int(calib_param["steering3_offset"])
+        steering4_offset = int(calib_param["steering4_offset"])
 
         #map_angle_with_offset(nilai raw, nilai min, nilai max, target min, target max, offset)
         steering1_sensor =  map_angle_with_offset((steering1_raw),steering_raw_min[0], steering_raw_max[0], 0, 360, steering1_offset) 
@@ -2514,19 +2518,20 @@ def on_message(client, userdata, message):
       
     if (t == 'rpm_propeller1'):
         global rpm1
-        rpm1 = float(msg)
+        
+        rpm1 = (float(msg) * 60 * (rpm_filter[0])) + (rpm1 * (1 - rpm_filter[0]))
             
     if (t == 'rpm_propeller2'):
         global rpm2
-        rpm2 = float(msg)
+        rpm2 = (float(msg) * 60 * (rpm_filter[1])) + (rpm2 * (1 - rpm_filter[1]))
             
     if (t == 'rpm_propeller3'):
         global rpm3
-        rpm3 = float(msg)
+        rpm3 = (float(msg) * 60 * (rpm_filter[2])) + (rpm3 * (1 - rpm_filter[2]))
             
     if (t == 'rpm_propeller4'):
         global rpm4
-        rpm4 = float(msg)
+        rpm4 = (float(msg) * 60 * (rpm_filter[3])) + (rpm4 * (1 - rpm_filter[3]))
         #print(rpm4)
     
     

@@ -652,9 +652,13 @@ steering_raw_max = calib_param["steering_raw_max"]
 
 rpm_filter = calib_param["rpm_filter"]
 
+a_propeller = (calib_param["a_propeller"])
+b_propeller = (calib_param["b_propeller"])
+c_propeller = (calib_param["c_propeller"])
 
 
-print("rpm_filter",rpm_filter)
+
+print("a_propeller",a_propeller)
 
 heading_first = ""
 
@@ -983,6 +987,12 @@ class UpdateWorker(QThread):
 
 class table(QObject):    
     updateFinished = pyqtSignal()
+    
+    Propeller1_char = pyqtSignal()
+    Propeller2_char = pyqtSignal()
+    Propeller3_char = pyqtSignal()
+    Propeller4_char = pyqtSignal()
+
     def __init__(self, parent = None):
         super().__init__(parent)
         self.app = QApplication(sys.argv)

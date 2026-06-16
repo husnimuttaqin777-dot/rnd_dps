@@ -271,6 +271,22 @@ Window {
 			
         }
 
+		function onPropeller1_char(a, b, c) {
+            processData1(a, b, c)
+        }
+
+		function onPropeller2_char(a, b, c) {
+            processData2(a, b, c)
+        }
+
+		function onPropeller3_char(a, b, c) {
+            processData3(a, b, c)
+        }
+
+		function onPropeller4_char(a, b, c) {
+            processData4(a, b, c)
+        }
+
 
 
     }
@@ -5147,46 +5163,72 @@ Window {
 					border.color : line_color
 
 
+
+
 					ChartView {
-						anchors.horizontalCenter: parent.horizontalCenter
-						anchors.verticalCenter: parent.verticalCenter
-						width: parent.width*1.2
-						height: parent.height*1
-						backgroundColor : "transparent"
-						legend.visible: false
-						
+					anchors.horizontalCenter: parent.horizontalCenter
+					anchors.verticalCenter: parent.verticalCenter
+					width: parent.width * 1.2
+					height: parent.height * 1
 
-						antialiasing: true
+					backgroundColor: "transparent"
+					legend.visible: false
+					antialiasing: true
 
-						ValueAxis {
-							id: axisX_1
-							min: 0
-							max: 100
-							labelsColor: "white"
-						}
-
-						ValueAxis {
-							id: axisY_1
-							min: -1
-							max: 1
-							labelsColor: "white"
-						}
-
-						LineSeries {
-							id: lineSeries
-
-							axisX: axisX_1
-							axisY: axisY_1
-
-							XYPoint { x: 0; y: 0 }
-							XYPoint { x: 1; y: 0.5 }
-							XYPoint { x: 2; y: 0.8 }
-							XYPoint { x: 3; y: 0.2 }
-							XYPoint { x: 4; y: -0.5 }
-						}
+					ValueAxis {
+						id: axisX_1
+						min: 0
+						max: 100
 					}
-				
-				
+
+					ValueAxis {
+						id: axisY_1
+						min: 0
+						max: 1.1
+						labelsColor: "white"
+					}
+
+					LineSeries {
+						id: lineSeries
+						axisX: axisX_1
+						axisY: axisY_1
+					}
+
+					property double y_prev: 0
+					property int sample: 0
+					property double y_max: 1
+
+					function processData(a, K) {
+						if (sample >= 100)
+							return
+
+						var y_now = a * y_prev + K * (1 - a)
+
+						lineSeries.append(sample, y_now)
+
+						if (y_now > y_max) {
+							y_max = y_now
+							axisY_1.max = y_max * 1.1
+						}
+
+						y_prev = y_now
+						sample++
+					}
+
+					Component.onCompleted: {
+						lineSeries.clear()
+
+						sample = 0
+						y_prev = 0
+						y_max = 1
+
+						for (var i = 0; i < 100; i++) {
+							processData(0.951, 1.0)  // a = e^(-T/tau), K = gain
+						}
+
+						console.log("Points:", lineSeries.count)
+					}
+				}
 				}
 
 				Rectangle {
@@ -5218,8 +5260,8 @@ Window {
 
 						ValueAxis {
 							id: axisY_2
-							min: -1
-							max: 1
+							min: 0
+							max: 1.1
 							labelsColor: "white"
 						}
 
@@ -5228,12 +5270,44 @@ Window {
 
 							axisX: axisX_2
 							axisY: axisY_2
+						}
 
-							XYPoint { x: 0; y: 0 }
-							XYPoint { x: 1; y: 0.5 }
-							XYPoint { x: 2; y: 0.8 }
-							XYPoint { x: 3; y: 0.2 }
-							XYPoint { x: 4; y: -0.5 }
+						property double y_prev2: 0
+						property int sample2: 0
+						property double y_max2: 1
+
+						function processData2(a, K) {
+							if (sample2 >= 100)
+								return
+
+							var y_now2 = a * y_prev2 + K * (1 - a)
+
+							lineSeries2.append(sample2, y_now2)
+
+							if (y_now2 > y_max2) {
+								y_max2 = y_now2
+								axisY_2.max = y_max2 * 1.1
+							}
+
+							y_prev2 = y_now2
+							sample2++
+						}
+
+
+
+
+						Component.onCompleted: {
+							lineSeries2.clear()
+
+							sample2 = 0
+							y_prev2 = 0
+							y_max2 = 1
+
+							for (var i = 0; i < 100; i++) {
+								processData2(0.951, 1.0)  // a = e^(-T/tau), K = gain
+							}
+
+							console.log("Points2:", lineSeries2.count)
 						}
 					}
 				
@@ -5269,23 +5343,54 @@ Window {
 
 						ValueAxis {
 							id: axisY_3
-							min: -1
-							max: 1
+							min: 0
+							max: 1.1
 							labelsColor: "white"
 						}
 
 						LineSeries {
 							id: lineSeries3
-
 							axisX: axisX_3
 							axisY: axisY_3
-
-							XYPoint { x: 0; y: 0 }
-							XYPoint { x: 1; y: 0.5 }
-							XYPoint { x: 2; y: 0.8 }
-							XYPoint { x: 3; y: 0.2 }
-							XYPoint { x: 4; y: -0.5 }
 						}
+
+						property double y_prev3: 0
+						property int sample3: 0
+						property double y_max3: 1
+
+						function processData3(a, K) {
+							if (sample3 >= 100)
+								return
+
+							var y_now3 = a * y_prev3 + K * (1 - a)
+
+							lineSeries3.append(sample3, y_now3)
+
+							if (y_now3 > y_max3) {
+								y_max3 = y_now3
+								axisY_3.max = y_max3 * 1.1
+							}
+
+							y_prev3 = y_now3
+							sample3++
+						}
+
+						Component.onCompleted: {
+							lineSeries3.clear()
+
+							sample3 = 0
+							y_prev3 = 0
+							y_max3 = 1
+
+							for (var i = 0; i < 100; i++) {
+								processData3(0.951, 1.0)  // a = e^(-T/tau), K = gain
+							}
+
+							console.log("Points3:", lineSeries3.count)
+						}
+
+
+
 					}
 				
 				}
@@ -5319,23 +5424,53 @@ Window {
 
 						ValueAxis {
 							id: axisY_4
-							min: -1
-							max: 1
+							min: 0
+							max: 1.1
 							labelsColor: "white"
 						}
 
 						LineSeries {
 							id: lineSeries4
-
 							axisX: axisX_4
 							axisY: axisY_4
-
-							XYPoint { x: 0; y: 0 }
-							XYPoint { x: 1; y: 0.5 }
-							XYPoint { x: 2; y: 0.8 }
-							XYPoint { x: 3; y: 0.2 }
-							XYPoint { x: 4; y: -0.5 }
 						}
+
+						property double y_prev4: 0
+						property int sample4: 0
+						property double y_max4: 1
+
+						function processData4(a, K) {
+							if (sample4 >= 100)
+								return
+
+							var y_now4 = a * y_prev4 + K * (1 - a)
+
+							lineSeries4.append(sample4, y_now4)
+
+							if (y_now4 > y_max4) {
+								y_max4 = y_now4
+								axisY_4.max = y_max4 * 1.1
+							}
+
+							y_prev4 = y_now4
+							sample4++
+						}
+
+						Component.onCompleted: {
+							lineSeries4.clear()
+
+							sample4 = 0
+							y_prev4 = 0
+							y_max4 = 1
+
+							for (var i = 0; i < 100; i++) {
+								processData4(0.9, 1.0)  // a = e^(-T/tau), K = gain
+							}
+
+							console.log("Points4:", lineSeries4.count)
+						}
+
+
 					}
 				
 				}
@@ -6019,6 +6154,7 @@ Window {
 				console.log(points)
 				points2 = backend.points2()
 				drawAll();
+				
             }
 
 	property var rpl_lat: []

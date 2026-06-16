@@ -5111,6 +5111,286 @@ Window {
 			visible : false
 
 
+			Text{
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 10
+					text : " Propeller Characteristic "
+					font.pixelSize : 16
+					color : line_color
+					font.bold : true
+					font.family: "Helvetica"
+				}
+
+				Text{
+					x : 20
+					y : 60
+					text : "Propeller 1 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					Button{
+						x : 90
+						y : -5
+						text : "csv log"
+						width : 80
+					}
+				}
+
+				Rectangle {
+					y : 50
+					x : 200
+					width: 270
+					height : 200
+					color : "transparent"
+					border.width : 2
+					border.color : line_color
+
+
+					ChartView {
+						anchors.horizontalCenter: parent.horizontalCenter
+						anchors.verticalCenter: parent.verticalCenter
+						width: parent.width*1.2
+						height: parent.height*1
+						backgroundColor : "transparent"
+						legend.visible: false
+						
+
+						antialiasing: true
+
+						ValueAxis {
+							id: axisX_1
+							min: 0
+							max: 100
+							labelsColor: "white"
+						}
+
+						ValueAxis {
+							id: axisY_1
+							min: -1
+							max: 1
+							labelsColor: "white"
+						}
+
+						LineSeries {
+							id: lineSeries
+
+							axisX: axisX_1
+							axisY: axisY_1
+
+							XYPoint { x: 0; y: 0 }
+							XYPoint { x: 1; y: 0.5 }
+							XYPoint { x: 2; y: 0.8 }
+							XYPoint { x: 3; y: 0.2 }
+							XYPoint { x: 4; y: -0.5 }
+						}
+					}
+				
+				
+				}
+
+				Rectangle {
+					y : 50
+					x : 470
+					width: 270
+					height : 200
+					color : "transparent"
+					border.width : 2
+					border.color : line_color
+
+						ChartView {
+						anchors.horizontalCenter: parent.horizontalCenter
+						anchors.verticalCenter: parent.verticalCenter
+						width: parent.width*1.2
+						height: parent.height*1
+						backgroundColor : "transparent"
+						legend.visible: false
+						
+
+						antialiasing: true
+
+						ValueAxis {
+							id: axisX_2
+							min: 0
+							max: 100
+							labelsColor: "white"
+						}
+
+						ValueAxis {
+							id: axisY_2
+							min: -1
+							max: 1
+							labelsColor: "white"
+						}
+
+						LineSeries {
+							id: lineSeries2
+
+							axisX: axisX_2
+							axisY: axisY_2
+
+							XYPoint { x: 0; y: 0 }
+							XYPoint { x: 1; y: 0.5 }
+							XYPoint { x: 2; y: 0.8 }
+							XYPoint { x: 3; y: 0.2 }
+							XYPoint { x: 4; y: -0.5 }
+						}
+					}
+				
+				}
+
+
+				Rectangle {
+					y : 250
+					x : 200
+					width: 270
+					height : 200
+					color : "transparent"
+					border.width : 2
+					border.color : line_color
+
+						ChartView {
+						anchors.horizontalCenter: parent.horizontalCenter
+						anchors.verticalCenter: parent.verticalCenter
+						width: parent.width*1.2
+						height: parent.height*1
+						backgroundColor : "transparent"
+						legend.visible: false
+						
+
+						antialiasing: true
+
+						ValueAxis {
+							id: axisX_3
+							min: 0
+							max: 100
+							labelsColor: "white"
+						}
+
+						ValueAxis {
+							id: axisY_3
+							min: -1
+							max: 1
+							labelsColor: "white"
+						}
+
+						LineSeries {
+							id: lineSeries3
+
+							axisX: axisX_3
+							axisY: axisY_3
+
+							XYPoint { x: 0; y: 0 }
+							XYPoint { x: 1; y: 0.5 }
+							XYPoint { x: 2; y: 0.8 }
+							XYPoint { x: 3; y: 0.2 }
+							XYPoint { x: 4; y: -0.5 }
+						}
+					}
+				
+				}
+
+				Rectangle {
+					y : 250
+					x : 470
+					width: 270
+					height : 200
+					color : "transparent"
+					border.width : 2
+					border.color : line_color
+
+						ChartView {
+						anchors.horizontalCenter: parent.horizontalCenter
+						anchors.verticalCenter: parent.verticalCenter
+						width: parent.width*1.2
+						height: parent.height*1
+						backgroundColor : "transparent"
+						legend.visible: false
+						
+
+						antialiasing: true
+
+						ValueAxis {
+							id: axisX_4
+							min: 0
+							max: 100
+							labelsColor: "white"
+						}
+
+						ValueAxis {
+							id: axisY_4
+							min: -1
+							max: 1
+							labelsColor: "white"
+						}
+
+						LineSeries {
+							id: lineSeries4
+
+							axisX: axisX_4
+							axisY: axisY_4
+
+							XYPoint { x: 0; y: 0 }
+							XYPoint { x: 1; y: 0.5 }
+							XYPoint { x: 2; y: 0.8 }
+							XYPoint { x: 3; y: 0.2 }
+							XYPoint { x: 4; y: -0.5 }
+						}
+					}
+				
+				}
+
+
+				Text{
+					x : 20
+					y : 110
+					text : "Propeller 2 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					Button{
+						x : 90
+						y : -5
+						text : "csv log"
+						width : 80
+					}
+				}
+
+				Text{
+					x : 20
+					y : 160
+					text : "Propeller 3 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					Button{
+						x : 90
+						y : -5
+						text : "csv log"
+						width : 80
+					}
+				}
+
+
+				Text{
+					x : 20
+					y : 210
+					text : "Propeller 4 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+				
+					Button{
+						x : 90
+						y : -5
+						text : "csv log"
+						width : 80
+					}
+				}
+
+
 			
 
 

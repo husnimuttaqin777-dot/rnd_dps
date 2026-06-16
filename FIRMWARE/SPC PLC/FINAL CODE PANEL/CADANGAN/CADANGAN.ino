@@ -1,31 +1,15 @@
-#include <ETH.h>
+
 #include <PubSubClient.h>
 #include <LittleFS.h>
+#include <Ethernet.h>
 
-// ===== Konfigurasi Ethernet (WT32-ETH01 + LAN8720) =====
-#define ETH_ADDR        1
-#define ETH_POWER_PIN   16
-#define ETH_MDC_PIN     23
-#define ETH_MDIO_PIN    18
-#define ETH_TYPE        ETH_PHY_LAN8720
-#define ETH_CLK_MODE    ETH_CLOCK_GPIO0_IN
 
-bool eth_connected = false;
 
-// ===== IP Static =====
-IPAddress local_IP(123, 45, 0, 102);   // IP WT32
-IPAddress gateway(123, 45, 0, 1);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(8, 8, 8, 8);
 
-// ===== MQTT Config =====
-const char* mqtt_server = "123.45.0.10";  // IP PC
-const int mqtt_port = 1883;
-const char* mqtt_client_name = "PANEL_02";
+byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xE6 }; 
 
-WiFiClient ethClient;
-PubSubClient client(ethClient);
-
+IPAddress ip(123,45,0,101);
+IPAddress server(123,45,0,10);
 
 String steering1 = "";
 String steering2 = "";
@@ -36,9 +20,6 @@ String steering2 = "";
 
 #define MAX485_DE 14
 
-
-//DI => TX  6
-//RO => RX 5
 HardwareSerial Serial2Port(2); // UART2
 
 ModbusMaster node;
@@ -84,8 +65,8 @@ int central_mode;
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-#define SDA_PIN 33
-#define SCL_PIN 32
+#define SDA_PIN 21
+#define SCL_PIN 22
 
 
 int zone1;
@@ -103,54 +84,30 @@ int steering2_sensor_calibrated;
 int steering1_offset;
 int steering2_offset;
 
+
 int propeller1_prev;
 int propeller2_prev;
 
 
-// ===== Event handler Ethernet =====
-void WiFiEvent(WiFiEvent_t event) {
-  switch (event) {
-    case ARDUINO_EVENT_ETH_START:
-      Serial.println("Ethernet mulai...");
-      ETH.setHostname("WT32-ETH01");
-      break;
-    case ARDUINO_EVENT_ETH_CONNECTED:
-      Serial.println("Ethernet tersambung!");
-      break;
-    case ARDUINO_EVENT_ETH_GOT_IP:
-      Serial.print("IP Address: ");
-      Serial.println(ETH.localIP());
-      eth_connected = true;
-      break;
-    case ARDUINO_EVENT_ETH_DISCONNECTED:
-      Serial.println("Ethernet terputus!");
-      eth_connected = false;
-      break;
-    default:
-      break;
-  }
-}
+
 
 // ===== Reconnect ke MQTT broker =====
+EthernetClient ethClient;
+PubSubClient client(ethClient);
 void reconnect() {
-  while (!eth_connected) {
-    
-    Serial.println("Menunggu koneksi Ethernet...");
-    delay(1000);
-  }
 
   while (!client.connected()) {
     Serial.print("Menyambung ke MQTT broker...");
-    if (client.connect(mqtt_client_name)) {
+    if (client.connect("PANEL1")) {
       Serial.println("Terhubung ke MQTT!");
       client.subscribe("lamp1");    // Subskrip topik
       client.subscribe("central_mode");
-      client.subscribe("Steering_2");
-      client.subscribe("Steering_3");
-      client.subscribe("propeller2");
-      client.subscribe("propeller3");
-      client.subscribe("steering2_offset");
-      client.subscribe("steering3_offset");
+      client.subscribe("Steering_1");
+      client.subscribe("Steering_4");
+      client.subscribe("propeller1");
+      client.subscribe("propeller4");
+      client.subscribe("steering1_offset");
+      client.subscribe("steering4_offset");
       client.publish("system", "WT32 online");  // Kirim status online
     } else {
       Serial.print("Gagal, rc=");
@@ -214,7 +171,6 @@ void loadConfig() {
 
   zone1_prev = zone1;
   zone2_prev = zone2;
- 
 }
 
 
@@ -235,23 +191,9 @@ void setup() {
   delay(1000);
   Serial.println("Booting WT32-ETH01 MQTT...");
 
-  pinMode(12, OUTPUT);
-  digitalWrite(12, LOW);
-
-  // Power ke PHY
-  pinMode(ETH_POWER_PIN, OUTPUT);
-  digitalWrite(ETH_POWER_PIN, HIGH);
-  delay(100);
-
-  WiFi.onEvent(WiFiEvent);
-  ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_CLK_MODE);
-
-  // Gunakan IP statis
-  ETH.config(local_IP, gateway, subnet, dns);
-
-  // MQTT
-  client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
+  pinMode (10, OUTPUT);
+  Ethernet.init(10);  
+  Ethernet.begin(mac, ip);
 
   Serial2Port.begin(9600, SERIAL_8N1, 5, 17); 
 
@@ -277,7 +219,7 @@ void setup() {
   // Print a message to the LCD.
   lcd.backlight();
   lcd.setCursor(0,0);
-  lcd.print("     PANEL 2");
+  lcd.print("     PANEL 1");
 
   loadConfig();
 
@@ -294,7 +236,7 @@ void callback(char* topic, byte* message, unsigned int length) {
   String messageTemp;
 
   for (int i = 0; i < length; i++) {
-    //Serial.print((char)message[i]);
+    Serial.print((char)message[i]);
     messageTemp += (char)message[i];
   }
   
@@ -303,10 +245,8 @@ void callback(char* topic, byte* message, unsigned int length) {
     central_mode = messageTemp.toInt();
   }
 
-  if (String(topic) == "Steering_2") {
+  if (String(topic) == "Steering_1") {
     steering1 = messageTemp;
-    Serial.print("s2 : ");
-    Serial.println(messageTemp);
 
     if (steering1 == "Kiri"){
     node.writeSingleCoil(1, 1);
@@ -328,13 +268,11 @@ void callback(char* topic, byte* message, unsigned int length) {
     lcd.setCursor(5,3);
     lcd.print("X V");
   } 
+
   }
 
-  if (String(topic) == "Steering_3") {
+  if (String(topic) == "Steering_4") {
     steering2 = messageTemp;
-    Serial.print("s3 : ");
-    Serial.println(messageTemp);
-
 
     
   if (steering2 == "Kiri"){
@@ -359,13 +297,14 @@ void callback(char* topic, byte* message, unsigned int length) {
   } 
 
 
+
   }
 
-  if (String(topic) == "propeller2") {
+  if (String(topic) == "propeller1") {
     propeller1 = (messageTemp.toInt());
   }
 
-  if (String(topic) == "propeller3") {
+  if (String(topic) == "propeller4") {
     propeller2 = (messageTemp.toInt());
   }
 
@@ -397,9 +336,9 @@ void loop() {
   if (!client.connected()) {
     uint8_t result;
     result = node.writeSingleRegister(22, 100);
-    //Serial.println(result);
+    Serial.println(result);
     result = node.writeSingleRegister(23, 100);
-    //Serial.println(result);
+    Serial.println(result);
     node.writeSingleCoil(1, 0);
     node.writeSingleCoil(2, 0);
     node.writeSingleCoil(3, 0);
@@ -415,7 +354,7 @@ void loop() {
   }
 
   client.loop();
-  
+
   unsigned long now = millis();
   if (now - lastMsg > 500) {  
     lastMsg = now;
@@ -442,11 +381,11 @@ void loop() {
       boot = 1;
     }
 
-    if ((analog1-analog1_prev) < -75){
+    if ((analog1-analog1_prev) < -45){
       zone1 = zone1 + 1;
     }
 
-    if ((analog1-analog1_prev) > 75){
+    if ((analog1-analog1_prev) > 45){
       zone1 = zone1 - 1;
     }
     if (zone1 > 3){
@@ -508,16 +447,13 @@ void loop() {
 
 
     if ((zone1 != zone1_prev) or (zone2 != zone2_prev)){
-
       saveConfig(zone1, zone2);
-      /*
       Serial.print(zone1);
       Serial.print(":");
       Serial.print(zone1_prev);
       Serial.print("|");
       Serial.print(zone2);
       Serial.println(zone2_prev);
-      */
     }
 
 
@@ -530,7 +466,8 @@ void loop() {
 
     Serial.print(" pot2  = ");
     Serial.print(analog2);
-
+    
+    
     Serial.print(" zone1 ");
     Serial.print(zone1);
 
@@ -539,9 +476,9 @@ void loop() {
 
     Serial.println();
     */
+    
     lcd.setCursor(0,2);
     lcd.print("PLC: V ");
-    
 
 
   } else {
@@ -557,7 +494,6 @@ void loop() {
   } else {
     node.writeSingleCoil(0, 0);
   }
-
   if (propeller1 != propeller1_prev){
     node.writeSingleRegister(22, (100 - propeller1));
     if (propeller1 == 0){
@@ -576,15 +512,13 @@ void loop() {
   }
 
   }
-
-
   lcd.setCursor(0,3);
   lcd.print("SSR :");
 
   
   lcd.setCursor(8,3);
   lcd.print("|");
-
+  
 
   /*
   Serial.print(" |s : ");
@@ -614,26 +548,22 @@ void loop() {
 
   lcd.setCursor(7, 2);
   lcd.print(buf1);
+
+
+  client.publish("steering1_sensor",dtostrf(steering1_sensor_calibrated, 1, 2, steering1_sensor_send));
+  client.publish("steering4_sensor",dtostrf(steering2_sensor_calibrated, 1, 2, steering2_sensor_send));
+  client.publish("rpm_propeller1",dtostrf(rpm_propeller1, 1, 2, rpm_propeller1_send));
+  client.publish("rpm_propeller4",dtostrf(rpm_propeller2, 1, 2, rpm_propeller2_send));
+
+  client.publish("lpm_propeller1",dtostrf(lpm_propeller1, 1, 2, lpm_propeller1_send));
+  client.publish("lpm_propeller4",dtostrf(lpm_propeller2, 1, 2, lpm_propeller2_send));
   
-
-
-
-
-
-  client.publish("steering2_sensor",dtostrf(steering1_sensor_calibrated, 1, 2, steering1_sensor_send));
-  client.publish("steering3_sensor",dtostrf(steering2_sensor_calibrated, 1, 2, steering2_sensor_send));
-  client.publish("rpm_propeller2",dtostrf(rpm_propeller1, 1, 2, rpm_propeller1_send));
-  client.publish("rpm_propeller3",dtostrf(rpm_propeller2, 1, 2, rpm_propeller2_send));
-
-  client.publish("lpm_propeller2",dtostrf(lpm_propeller1, 1, 2, lpm_propeller1_send));
-  client.publish("lpm_propeller3",dtostrf(lpm_propeller2, 1, 2, lpm_propeller2_send));
-  
-  client.publish("rpm_engine2",dtostrf(rpm_engine, 1, 2, rpm_engine_send));
+  client.publish("rpm_engine1",dtostrf(rpm_engine, 1, 2, rpm_engine_send));
 
 
     
     
-  client.publish("panel2", "heartbeat");
+  client.publish("panel1", "heartbeat");
   //Serial.println("Publish: system -> heartbeat");
 
   analog1_prev = analog1;
@@ -644,7 +574,6 @@ void loop() {
 
   propeller1_prev = propeller1;
   propeller2_prev = propeller2;
-
   }
 
 }

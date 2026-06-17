@@ -172,7 +172,32 @@ def load_polygons():
 
     return polygons
 
+from scipy.optimize import curve_fit
 
+def identification(x, y):
+
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+
+    def model(t, K, tau):
+        return K * (1 - np.exp(-t / tau))
+
+    p0 = [
+        np.max(y),
+        (x[-1] - x[0]) / 5
+    ]
+
+    popt, _ = curve_fit(
+        model,
+        x,
+        y,
+        p0=p0,
+        bounds=([0,0], [np.inf,np.inf])
+    )
+
+    K, tau = popt
+
+    return K, tau
 
 
 
@@ -652,15 +677,11 @@ steering_raw_max = calib_param["steering_raw_max"]
 
 rpm_filter = calib_param["rpm_filter"]
 
-a_propeller = (calib_param["a_propeller"])
-b_propeller = (calib_param["b_propeller"])
-c_propeller = (calib_param["c_propeller"])
+k_propeller = (calib_param["k_propeller"])
+tau_propeller = (calib_param["tau_propeller"])
 
 
 
-print("a_propeller",a_propeller)
-
-heading_first = ""
 
 speed_button = 0
 
@@ -1214,6 +1235,64 @@ class table(QObject):
         global heading_method
         heading_method = method
         #print(heading_method)
+
+    @pyqtSlot(str)
+    def identification1(self, file):
+        df = pd.read_csv(file)
+
+        x = df["x"].values
+        y = df["y"].values
+
+        K, tau = identification(x, y)
+
+
+        print(f"K   = {K:.4f}")
+        print(f"tau = {tau:.4f}")
+
+    
+
+    @pyqtSlot(str)
+    def identification2(self, file):
+        df = pd.read_csv(file)
+
+        x = df["x"].values
+        y = df["y"].values
+
+        K, tau = identification(x, y)
+
+
+        print(f"K   = {K:.4f}")
+        print(f"tau = {tau:.4f}")
+
+    
+
+    @pyqtSlot(str)
+    def identification3(self, file):
+        df = pd.read_csv(file)
+
+        x = df["x"].values
+        y = df["y"].values
+
+        K, tau = identification(x, y)
+
+
+        print(f"K   = {K:.4f}")
+        print(f"tau = {tau:.4f}")
+        
+    
+    @pyqtSlot(str)
+    def identification4(self, file):
+        df = pd.read_csv(file)
+
+        x = df["x"].values
+        y = df["y"].values
+
+        K, tau = identification(x, y)
+
+
+        print(f"K   = {K:.4f}")
+        print(f"tau = {tau:.4f}")
+    
     
     @pyqtSlot(float)
     def estimate_rpl(self, line):
@@ -1634,11 +1713,7 @@ class table(QObject):
         fsm_scheme = value
     
 
-    @pyqtSlot('QString')
-    def heading_first(self, value):
-        global heading_first
-        heading_first = value
-        print(heading_first)
+    
     
     
     @pyqtSlot('QString')
@@ -1736,14 +1811,7 @@ class table(QObject):
         print(rpl_long)
         
 
-        if (heading_first == "yes"):
-            try:
-                heading_target = int(shortest_psi(heading, map_angle_conversion(float(rpl_lat[0]), float(rpl_long[0]), val_latitude, val_longitude)))
-                
-            except:
-                heading_target = 0
-
-            print(f"heading target = {heading_target}")
+       
         
          
 

@@ -3789,26 +3789,7 @@ Window {
 			}
 
 
-			Button{
-				id : heading_lock
-				x: 20
-				y : 180
-				text: "Heading Lock"
-				visible : true
-				checkable : true
-				onClicked:{
-					if (checked){
-						backend.heading_first("yes")
-						console.log("head")
-						
-					} else {
-						backend.heading_first("no")
-						console.log("free")
-						//slider.visible = false
-					}
-					//backend.remove("back")							
-                    }
-			}
+			
 						
 					
 
@@ -4165,7 +4146,7 @@ Window {
 			id : hardware_setting
 			x : 152
 			y: 30
-			text : "Engine Sensor"
+			text : "Sensor"
 			checked : false
 			checkable : true
 
@@ -5150,6 +5131,35 @@ Window {
 						y : -5
 						text : "csv log"
 						width : 80
+
+						onClicked:{
+							fileDialog1.visible = true
+							
+							
+							
+						}
+
+						FileDialog {
+							id: fileDialog1
+							title: "Please choose a file"
+							folder: shortcuts.home
+							//selectFolder : true
+							visible : false
+						
+						onAccepted: {
+							//console.log("You chose: " + fileDialog.fileUrls)
+							backend.identification1(fileDialog1.fileUrls)
+							fileDialog1.visible = false
+						}
+						
+						onRejected: {
+							//console.log("Canceled")
+							fileDialog1.visible = false
+						}
+					}
+						
+
+
 					}
 				}
 
@@ -5179,6 +5189,7 @@ Window {
 						id: axisX_1
 						min: 0
 						max: 100
+						labelsColor: "white"
 					}
 
 					ValueAxis {
@@ -5489,6 +5500,34 @@ Window {
 						y : -5
 						text : "csv log"
 						width : 80
+
+
+						onClicked:{
+							fileDialog2.visible = true
+							
+							
+							
+						}
+
+						FileDialog {
+							id: fileDialog2
+							title: "Please choose a file"
+							folder: shortcuts.home
+							//selectFolder : true
+							visible : false
+						
+						onAccepted: {
+							//console.log("You chose: " + fileDialog.fileUrls)
+							backend.identification2(fileDialog2.fileUrls)
+							fileDialog2.visible = false
+						}
+						
+						onRejected: {
+							//console.log("Canceled")
+							fileDialog2.visible = false
+						}
+					}
+						
 					}
 				}
 
@@ -5505,6 +5544,35 @@ Window {
 						y : -5
 						text : "csv log"
 						width : 80
+
+						onClicked:{
+							fileDialog3.visible = true
+							
+							
+							
+						}
+
+						FileDialog {
+							id: fileDialog3
+							title: "Please choose a file"
+							folder: shortcuts.home
+							//selectFolder : true
+							visible : false
+						
+						onAccepted: {
+							//console.log("You chose: " + fileDialog.fileUrls)
+							backend.identification3(fileDialog3.fileUrls)
+							fileDialog3.visible = false
+						}
+						
+						onRejected: {
+							//console.log("Canceled")
+							fileDialog3.visible = false
+						}
+					}
+						
+
+
 					}
 				}
 
@@ -5522,6 +5590,34 @@ Window {
 						y : -5
 						text : "csv log"
 						width : 80
+
+						onClicked:{
+							fileDialog4.visible = true
+							
+							
+							
+						}
+
+						FileDialog {
+							id: fileDialog4
+							title: "Please choose a file"
+							folder: shortcuts.home
+							//selectFolder : true
+							visible : false
+						
+						onAccepted: {
+							//console.log("You chose: " + fileDialog.fileUrls)
+							backend.identification4(fileDialog4.fileUrls)
+							fileDialog4.visible = false
+						}
+						
+						onRejected: {
+							//console.log("Canceled")
+							fileDialog4.visible = false
+						}
+
+
+
 					}
 				}
 
@@ -6530,16 +6626,7 @@ Window {
 		heading_error.text = "heading error : " + backend.heading_error() + " °"
 		
 		
-		if (heading_lock.checked){
-			slider.visible = true
-			slider.interactive = true
-			console.log(slider.value)
-			backend.heading_target_slot(slider.value)
-		} else {
-			slider.visible = false
-			slider.interactive = false
-			slider.value = backend.headingship()
-		}
+		
 
 		compass_val.text =  "<font color='gold'>" + slider.value + "</font>"
 		

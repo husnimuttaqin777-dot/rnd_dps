@@ -48,9 +48,6 @@ Window {
 	property double lat2;
 	property double long2;
 	
-
-
-    
 	property real lat_barge1: -0.5786279718662478
     property real long_barge1: 117.27512174731385
 
@@ -151,6 +148,13 @@ Window {
 	property var sample : 0;
 	property var y_prev : 0;
 	property var y_max : 0;
+
+	property var y_prev2: 0;
+	property var sample2: 0;
+	property var y_max2: 1;
+
+	property var k_propeller_prev : [0,0,0,0];
+	property var tau_propeller_prev : [0,0,0,0];
 
 
 	function toRadians(degrees) {
@@ -261,6 +265,8 @@ Window {
         }
 
     }
+
+	
 
     
         
@@ -5148,6 +5154,8 @@ Window {
 					}
 				}
 
+				
+
 				Rectangle {
 					y : 50
 					x : 200
@@ -5156,6 +5164,27 @@ Window {
 					color : "transparent"
 					border.width : 2
 					border.color : line_color
+
+					Text{
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 5
+					text : "Propeller 1"
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
+
+					Text{
+					id : propeller1_characteristic
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 170
+					text : "K : Tau : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
 
 
 
@@ -5190,47 +5219,13 @@ Window {
 						axisY: axisY_1
 					}
 
-					property double y_prev: 0
-					property int sample: 0
-					property double y_max: 1
-
-					function processData(a, K) {
-						if (sample >= 100)
-							return
-
-						var y_now = a * y_prev + K * (1 - a)
-
-						lineSeries.append(sample, y_now)
-
-						if (y_now > y_max) {
-							y_max = y_now
-							axisY_1.max = y_max * 1.1
-						}
-
-						y_prev = y_now
-						sample++
-					}
-
-
-
-
-					Component.onCompleted: {
-						lineSeries.clear()
-
-						sample = 0
-						y_prev = 0
-						y_max = 1
-
-						for (var i = 0; i < 100; i++) {
-							processData(0.951, 1.0)  // a = e^(-T/tau), K = gain
-						}
-
-						console.log("Points1:", lineSeries1.count)
-					}
-
 					
+					
+
 				}
-				}
+				
+			
+			}
 
 				Rectangle {
 					y : 50
@@ -5240,6 +5235,28 @@ Window {
 					color : "transparent"
 					border.width : 2
 					border.color : line_color
+
+					Text{
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 5
+					text : "Propeller 2"
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
+
+					Text{
+					id : propeller2_characteristic
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 170
+					text : "K : Tau : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
+
 
 						ChartView {
 						anchors.horizontalCenter: parent.horizontalCenter
@@ -5273,43 +5290,6 @@ Window {
 							axisY: axisY_2
 						}
 
-						property double y_prev2: 0
-						property int sample2: 0
-						property double y_max2: 1
-
-						function processData2(a, K) {
-							if (sample2 >= 100)
-								return
-
-							var y_now2 = a * y_prev2 + K * (1 - a)
-
-							lineSeries2.append(sample2, y_now2)
-
-							if (y_now2 > y_max2) {
-								y_max2 = y_now2
-								axisY_2.max = y_max2 * 1.1
-							}
-
-							y_prev2 = y_now2
-							sample2++
-						}
-
-
-
-
-						Component.onCompleted: {
-							lineSeries2.clear()
-
-							sample2 = 0
-							y_prev2 = 0
-							y_max2 = 1
-
-							for (var i = 0; i < 100; i++) {
-								processData2(0.951, 1.0)  // a = e^(-T/tau), K = gain
-							}
-
-							console.log("Points2:", lineSeries2.count)
-						}
 					}
 				
 				}
@@ -5323,6 +5303,28 @@ Window {
 					color : "transparent"
 					border.width : 2
 					border.color : line_color
+
+
+					Text{
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 5
+					text : "Propeller 3"
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
+
+					Text{
+					id : propeller3_characteristic
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 170
+					text : "K : Tau : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
 
 						ChartView {
 						anchors.horizontalCenter: parent.horizontalCenter
@@ -5359,39 +5361,6 @@ Window {
 						property int sample3: 0
 						property double y_max3: 1
 
-						function processData3(a, K) {
-							if (sample3 >= 100)
-								return
-
-							var y_now3 = a * y_prev3 + K * (1 - a)
-
-							lineSeries3.append(sample3, y_now3)
-
-							if (y_now3 > y_max3) {
-								y_max3 = y_now3
-								axisY_3.max = y_max3 * 1.1
-							}
-
-							y_prev3 = y_now3
-							sample3++
-						}
-
-						Component.onCompleted: {
-							lineSeries3.clear()
-
-							sample3 = 0
-							y_prev3 = 0
-							y_max3 = 1
-
-							for (var i = 0; i < 100; i++) {
-								processData3(0.951, 1.0)  // a = e^(-T/tau), K = gain
-							}
-
-							console.log("Points3:", lineSeries3.count)
-						}
-
-
-
 					}
 				
 				}
@@ -5404,6 +5373,27 @@ Window {
 					color : "transparent"
 					border.width : 2
 					border.color : line_color
+
+					Text{
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 5
+					text : "Propeller 4"
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
+
+					Text{
+					id : propeller4_characteristic
+					anchors.horizontalCenter: parent.horizontalCenter
+					y : 170
+					text : "K : Tau : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+					}
 
 						ChartView {
 						anchors.horizontalCenter: parent.horizontalCenter
@@ -5436,40 +5426,7 @@ Window {
 							axisY: axisY_4
 						}
 
-						property double y_prev4: 0
-						property int sample4: 0
-						property double y_max4: 1
-
-						function processData4(a, K) {
-							if (sample4 >= 100)
-								return
-
-							var y_now4 = a * y_prev4 + K * (1 - a)
-
-							lineSeries4.append(sample4, y_now4)
-
-							if (y_now4 > y_max4) {
-								y_max4 = y_now4
-								axisY_4.max = y_max4 * 1.1
-							}
-
-							y_prev4 = y_now4
-							sample4++
-						}
-
-						Component.onCompleted: {
-							lineSeries4.clear()
-
-							sample4 = 0
-							y_prev4 = 0
-							y_max4 = 1
-
-							for (var i = 0; i < 100; i++) {
-								processData4(0.9, 1.0)  // a = e^(-T/tau), K = gain
-							}
-
-							console.log("Points4:", lineSeries4.count)
-						}
+						
 
 
 					}
@@ -5580,6 +5537,10 @@ Window {
 						y : -5
 						text : "csv log"
 						width : 80
+
+						onClicked:{
+							fileDialog4.visible = true
+						}
 						
 						FileDialog {
 							id: fileDialog4
@@ -6405,12 +6366,56 @@ Window {
 
 
 
+
 	Timer{
 		id:controller_gui
-		interval: 100
+		interval: 200
 		repeat: true
 		running: true
 		onTriggered: {
+
+
+			//console.log(backend.tau_propeller())
+
+			if ((backend.k_propeller()[0] != k_propeller_prev[0]) ||
+				(backend.tau_propeller()[0] != tau_propeller_prev[0])) {
+				var data = []
+
+				sample = 0
+				y_prev = 0
+				y_max = 1
+
+				for (var i = 0; i < 100; i++) {
+
+					var K = backend.k_propeller()[0]
+					var tau = backend.tau_propeller()[0]
+
+					var Ts = 1.0
+					var a1 = Math.exp(-Ts / backend.tau_propeller()[0])
+
+					var y_now = a1 * y_prev + backend.k_propeller()[0] * (1 - a1)
+
+					data.push(y_now)
+
+					if (y_now > y_max) {
+						y_max = y_now
+					}
+
+					y_prev = y_now
+					sample++
+				}
+
+				axisY_1.max = y_max * 1.1
+
+				lineSeries.clear()
+
+				for (var j = 0; j < data.length; j++) {
+					lineSeries.append(j, data[j])
+				}
+
+				propeller1_characteristic.text = "K = " + backend.k_propeller()[0].toFixed(2) +
+										" Ts = " + backend.tau_propeller()[0].toFixed(2)
+			}
 
 
             var p1 = backend.get_barge_point("a")
@@ -6705,8 +6710,10 @@ Window {
 			wind_attack.rotation = backend.winddirect()
 			gpsfront_status.color = backend.front_gps_color()	
 			lat_long_front_text.text = backend.lat_front() + "\n" + backend.long_front()
-
+		
 		}
+		k_propeller_prev = backend.k_propeller()
+		tau_propeller_prev = backend.tau_propeller()
 	}
 		
 }

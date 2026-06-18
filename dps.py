@@ -1218,6 +1218,13 @@ class table(QObject):
     @pyqtSlot(result=list)
     def points2(self):  return points2
 
+    @pyqtSlot(result = 'QVariantList')
+    def k_propeller(self): return k_propeller
+
+
+    @pyqtSlot(result = 'QVariantList')
+    def tau_propeller(self): return tau_propeller
+
 
     @pyqtSlot(result=str)
     def est(self):  return str(est)
@@ -1230,18 +1237,31 @@ class table(QObject):
 
     @pyqtSlot(str)
     def identification1(self, file):
+
+        global k_propeller
+        global tau_propeller
+        global calib_param
+
         df = pd.read_csv(file)
 
         x = df["x"].values
         y = df["y"].values
 
-        k_propeller[0], tau_propeller[0] = identification(x, y)
+        K, tau = identification(x, y)
+
+        print("K raw   :", K, type(K))
+        print("tau raw :", tau, type(tau))
+
+        # paksa menjadi float Python
+        k_propeller[0] = float(K)
+        tau_propeller[0] = float(tau)
 
         print(f"K   = {k_propeller}")
         print(f"tau = {tau_propeller}")
 
-        calib_param["k_propeller"] =  k_propeller
-        calib_param["tau_propeller"] =  tau_propeller
+        calib_param["k_propeller"] = k_propeller
+        calib_param["tau_propeller"] = tau_propeller
+
         with open("calib_param.json", "w") as f:
             json.dump(calib_param, f, indent=4)
 
@@ -1249,18 +1269,30 @@ class table(QObject):
 
     @pyqtSlot(str)
     def identification2(self, file):
+        global k_propeller
+        global tau_propeller
+        global calib_param
+
         df = pd.read_csv(file)
 
         x = df["x"].values
         y = df["y"].values
 
-        k_propeller[1], tau_propeller[1] = identification(x, y)
+        K, tau = identification(x, y)
+
+        print("K raw   :", K, type(K))
+        print("tau raw :", tau, type(tau))
+
+        # paksa menjadi float Python
+        k_propeller[1] = float(K)
+        tau_propeller[1] = float(tau)
 
         print(f"K   = {k_propeller}")
         print(f"tau = {tau_propeller}")
 
-        calib_param["k_propeller"] =  k_propeller
-        calib_param["tau_propeller"] =  tau_propeller
+        calib_param["k_propeller"] = k_propeller
+        calib_param["tau_propeller"] = tau_propeller
+
         with open("calib_param.json", "w") as f:
             json.dump(calib_param, f, indent=4)
 
@@ -1268,36 +1300,60 @@ class table(QObject):
 
     @pyqtSlot(str)
     def identification3(self, file):
+        global k_propeller
+        global tau_propeller
+        global calib_param
+
         df = pd.read_csv(file)
 
         x = df["x"].values
         y = df["y"].values
 
-        k_propeller[2], tau_propeller[2] = identification(x, y)
+        K, tau = identification(x, y)
+
+        print("K raw   :", K, type(K))
+        print("tau raw :", tau, type(tau))
+
+        # paksa menjadi float Python
+        k_propeller[2] = float(K)
+        tau_propeller[2] = float(tau)
 
         print(f"K   = {k_propeller}")
         print(f"tau = {tau_propeller}")
 
-        calib_param["k_propeller"] =  k_propeller
-        calib_param["tau_propeller"] =  tau_propeller
+        calib_param["k_propeller"] = k_propeller
+        calib_param["tau_propeller"] = tau_propeller
+
         with open("calib_param.json", "w") as f:
             json.dump(calib_param, f, indent=4)
         
     
     @pyqtSlot(str)
     def identification4(self, file):
+        global k_propeller
+        global tau_propeller
+        global calib_param
+
         df = pd.read_csv(file)
 
         x = df["x"].values
         y = df["y"].values
 
-        k_propeller[4], tau_propeller[4] = identification(x, y)
+        K, tau = identification(x, y)
+
+        print("K raw   :", K, type(K))
+        print("tau raw :", tau, type(tau))
+
+        # paksa menjadi float Python
+        k_propeller[3] = float(K)
+        tau_propeller[3] = float(tau)
 
         print(f"K   = {k_propeller}")
         print(f"tau = {tau_propeller}")
 
-        calib_param["k_propeller"] =  k_propeller
-        calib_param["tau_propeller"] =  tau_propeller
+        calib_param["k_propeller"] = k_propeller
+        calib_param["tau_propeller"] = tau_propeller
+
         with open("calib_param.json", "w") as f:
             json.dump(calib_param, f, indent=4)
     

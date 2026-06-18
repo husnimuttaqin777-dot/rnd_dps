@@ -148,6 +148,10 @@ Window {
 
 	property var satellite_order: [1]//[1, 2, 3] 
 
+	property var sample : 0;
+	property var y_prev : 0;
+	property var y_max : 0;
+
 
 	function toRadians(degrees) {
         return degrees * Math.PI / 180.0;
@@ -267,31 +271,12 @@ Window {
         function onUpdateFinished() {
             current_sea_model.clear()  
             update_seacurrent_data()
-
-			
         }
 
-		function onPropeller1_char(a, b, c) {
-            processData1(a, b, c)
-        }
-
-		function onPropeller2_char(a, b, c) {
-            processData2(a, b, c)
-        }
-
-		function onPropeller3_char(a, b, c) {
-            processData3(a, b, c)
-        }
-
-		function onPropeller4_char(a, b, c) {
-            processData4(a, b, c)
-        }
-
-
+		
 
     }
 
-	
 
 	
 	
@@ -5226,6 +5211,9 @@ Window {
 						sample++
 					}
 
+
+
+
 					Component.onCompleted: {
 						lineSeries.clear()
 
@@ -5237,8 +5225,10 @@ Window {
 							processData(0.951, 1.0)  // a = e^(-T/tau), K = gain
 						}
 
-						console.log("Points:", lineSeries.count)
+						console.log("Points1:", lineSeries1.count)
 					}
+
+					
 				}
 				}
 
@@ -5590,14 +5580,7 @@ Window {
 						y : -5
 						text : "csv log"
 						width : 80
-
-						onClicked:{
-							fileDialog4.visible = true
-							
-							
-							
-						}
-
+						
 						FileDialog {
 							id: fileDialog4
 							title: "Please choose a file"
@@ -5615,6 +5598,7 @@ Window {
 							//console.log("Canceled")
 							fileDialog4.visible = false
 						}
+					}
 
 
 

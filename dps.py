@@ -8,9 +8,6 @@ import datetime as dt
 import numpy as np
 import csv
 import json
-import glob
-
-
 
 
 from PyQt5.QtCore import * 
@@ -681,8 +678,6 @@ k_propeller = (calib_param["k_propeller"])
 tau_propeller = (calib_param["tau_propeller"])
 
 
-
-
 speed_button = 0
 
 propeller_mode = 0 
@@ -989,6 +984,8 @@ class UpdateWorker(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
+    
+
     def __init__(self, msg):
         super().__init__()
         self.msg = msg
@@ -1009,11 +1006,6 @@ class UpdateWorker(QThread):
 class table(QObject):    
     updateFinished = pyqtSignal()
     
-    Propeller1_char = pyqtSignal()
-    Propeller2_char = pyqtSignal()
-    Propeller3_char = pyqtSignal()
-    Propeller4_char = pyqtSignal()
-
     def __init__(self, parent = None):
         super().__init__(parent)
         self.app = QApplication(sys.argv)
@@ -1243,11 +1235,15 @@ class table(QObject):
         x = df["x"].values
         y = df["y"].values
 
-        K, tau = identification(x, y)
+        k_propeller[0], tau_propeller[0] = identification(x, y)
 
+        print(f"K   = {k_propeller}")
+        print(f"tau = {tau_propeller}")
 
-        print(f"K   = {K:.4f}")
-        print(f"tau = {tau:.4f}")
+        calib_param["k_propeller"] =  k_propeller
+        calib_param["tau_propeller"] =  tau_propeller
+        with open("calib_param.json", "w") as f:
+            json.dump(calib_param, f, indent=4)
 
     
 
@@ -1258,11 +1254,15 @@ class table(QObject):
         x = df["x"].values
         y = df["y"].values
 
-        K, tau = identification(x, y)
+        k_propeller[1], tau_propeller[1] = identification(x, y)
 
+        print(f"K   = {k_propeller}")
+        print(f"tau = {tau_propeller}")
 
-        print(f"K   = {K:.4f}")
-        print(f"tau = {tau:.4f}")
+        calib_param["k_propeller"] =  k_propeller
+        calib_param["tau_propeller"] =  tau_propeller
+        with open("calib_param.json", "w") as f:
+            json.dump(calib_param, f, indent=4)
 
     
 
@@ -1273,11 +1273,15 @@ class table(QObject):
         x = df["x"].values
         y = df["y"].values
 
-        K, tau = identification(x, y)
+        k_propeller[2], tau_propeller[2] = identification(x, y)
 
+        print(f"K   = {k_propeller}")
+        print(f"tau = {tau_propeller}")
 
-        print(f"K   = {K:.4f}")
-        print(f"tau = {tau:.4f}")
+        calib_param["k_propeller"] =  k_propeller
+        calib_param["tau_propeller"] =  tau_propeller
+        with open("calib_param.json", "w") as f:
+            json.dump(calib_param, f, indent=4)
         
     
     @pyqtSlot(str)
@@ -1287,11 +1291,15 @@ class table(QObject):
         x = df["x"].values
         y = df["y"].values
 
-        K, tau = identification(x, y)
+        k_propeller[4], tau_propeller[4] = identification(x, y)
 
+        print(f"K   = {k_propeller}")
+        print(f"tau = {tau_propeller}")
 
-        print(f"K   = {K:.4f}")
-        print(f"tau = {tau:.4f}")
+        calib_param["k_propeller"] =  k_propeller
+        calib_param["tau_propeller"] =  tau_propeller
+        with open("calib_param.json", "w") as f:
+            json.dump(calib_param, f, indent=4)
     
     
     @pyqtSlot(float)

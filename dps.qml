@@ -145,13 +145,6 @@ Window {
 
 	property var satellite_order: [1]//[1, 2, 3] 
 
-	property var sample : 0;
-	property var y_prev : 0;
-	property var y_max : 0;
-
-	property var y_prev2: 0;
-	property var sample2: 0;
-	property var y_max2: 1;
 
 	property var k_propeller_prev : [0,0,0,0];
 	property var tau_propeller_prev : [0,0,0,0];
@@ -265,6 +258,89 @@ Window {
         }
 
     }
+
+	property int sample: 0
+	property int sample2: 0
+	property int sample3: 0
+	property int sample4: 0
+
+	property real y_max1: 1
+	property real y_max2: 1
+	property real y_max3: 1
+	property real y_max4: 1
+
+	function process_chart(nilai_k, nilai_tau, propeller_no) {
+		var data = []
+		var y_prev = 0
+		var y_max = 1
+		var s = 0   // counter sample lokal, nanti di-assign ke sample/sample2/dst
+
+		var Ts = 1.0
+		var a1 = Math.exp(-Ts / nilai_tau)
+
+		for (var i = 0; i < 100; i++) {
+			var y_now = a1 * y_prev + nilai_k * (1 - a1)
+
+			data.push(y_now)
+
+			if (y_now > y_max) {
+				y_max = y_now
+			}
+
+			y_prev = y_now
+			s++
+		}
+
+		var targetSeries
+		var targetAxis
+		var targetText
+
+		switch (propeller_no) {
+			case 1:
+				targetSeries = lineSeries
+				targetAxis = axisY_1
+				targetText = propeller1_characteristic
+				sample = s
+				y_max1 = y_max   // kalau variabel globalnya namanya y_max1, sesuaikan
+				break
+			case 2:
+				targetSeries = lineSeries2
+				targetAxis = axisY_2
+				targetText = propeller2_characteristic
+				sample2 = s
+				y_max2 = y_max
+				break
+			case 3:
+				targetSeries = lineSeries3
+				targetAxis = axisY_3
+				targetText = propeller3_characteristic
+				sample3 = s
+				y_max3 = y_max
+				break
+			case 4:
+				targetSeries = lineSeries4
+				targetAxis = axisY_4
+				targetText = propeller4_characteristic
+				sample4 = s
+				y_max4 = y_max
+				break
+			default:
+				console.log("propeller_no tidak valid:", propeller_no)
+				return
+		}
+
+		targetAxis.max = y_max * 1.1
+
+		targetSeries.clear()
+		for (var j = 0; j < data.length; j++) {
+			targetSeries.append(j, data[j])
+		}
+
+		targetText.text = "K = " + nilai_k.toFixed(2) + " Ts = " + nilai_tau.toFixed(2)
+
+		console.log(data)
+		console.log("count =", targetSeries.count)
+	}
 
 	
 
@@ -6379,43 +6455,24 @@ Window {
 
 			if ((backend.k_propeller()[0] != k_propeller_prev[0]) ||
 				(backend.tau_propeller()[0] != tau_propeller_prev[0])) {
-				var data = []
-
-				sample = 0
-				y_prev = 0
-				y_max = 1
-
-				for (var i = 0; i < 100; i++) {
-
-					var K = backend.k_propeller()[0]
-					var tau = backend.tau_propeller()[0]
-
-					var Ts = 1.0
-					var a1 = Math.exp(-Ts / backend.tau_propeller()[0])
-
-					var y_now = a1 * y_prev + backend.k_propeller()[0] * (1 - a1)
-
-					data.push(y_now)
-
-					if (y_now > y_max) {
-						y_max = y_now
-					}
-
-					y_prev = y_now
-					sample++
+				process_chart(backend.k_propeller()[0], backend.tau_propeller()[0], 1)
 				}
 
-				axisY_1.max = y_max * 1.1
-
-				lineSeries.clear()
-
-				for (var j = 0; j < data.length; j++) {
-					lineSeries.append(j, data[j])
+			
+			if ((backend.k_propeller()[1] != k_propeller_prev[1]) ||
+				(backend.tau_propeller()[1] != tau_propeller_prev[1])) {
+				process_chart(backend.k_propeller()[1], backend.tau_propeller()[1], 2)
 				}
 
-				propeller1_characteristic.text = "K = " + backend.k_propeller()[0].toFixed(2) +
-										" Ts = " + backend.tau_propeller()[0].toFixed(2)
-			}
+			if ((backend.k_propeller()[2] != k_propeller_prev[2]) ||
+				(backend.tau_propeller()[2] != tau_propeller_prev[2])) {
+				process_chart(backend.k_propeller()[2], backend.tau_propeller()[2], 3)
+				}
+
+			if ((backend.k_propeller()[3] != k_propeller_prev[3]) ||
+				(backend.tau_propeller()[3] != tau_propeller_prev[3])) {
+				process_chart(backend.k_propeller()[3], backend.tau_propeller()[3], 4)
+				}
 
 
             var p1 = backend.get_barge_point("a")

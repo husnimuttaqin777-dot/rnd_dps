@@ -272,7 +272,7 @@ void loop() {
 
   if (central_status == 0){
       client.publish("central_status","local");
-  }
+  
 
 
 // steering DP1
@@ -338,11 +338,10 @@ if (buttonstate5_prev != buttonstate5 || buttonstate6_prev != buttonstate6){
     
    }
 
+
+
+
 }
-
-
-
-
 
 
 //steering DP4
@@ -397,10 +396,8 @@ if (buttonstate7_prev != buttonstate7 || buttonstate8_prev != buttonstate8){
     
    }
    else{}
-  client.publish("joystick_mqtt", "on");
 
-
-  gas_time = millis() - gas_time_prev;
+    gas_time = millis() - gas_time_prev;
   if (gas_time > 500){
     /*
     client.publish("propeller1", dtostrf(speed1,3,0,speed1_out));
@@ -447,7 +444,13 @@ if (buttonstate7_prev != buttonstate7 || buttonstate8_prev != buttonstate8){
   
   
   }
+
+  }
+
+    client.publish("joystick_mqtt", "on");
+
   
+  /*
   steer1_command = map(analogRead(A12),0, 1023,360,0);
   steer2_command = map(analogRead(A13),0, 1023,360,0);
   steer3_command = map(analogRead(A14),0, 1023,360,0);
@@ -457,7 +460,7 @@ if (buttonstate7_prev != buttonstate7 || buttonstate8_prev != buttonstate8){
   client.publish("steer2_command", dtostrf(steer2_command,3,0,steer2_command_send));
   client.publish("steer3_command", dtostrf(steer3_command,3,0,steer3_command_send));
   client.publish("steer4_command", dtostrf(steer4_command,3,0,steer4_command_send));
-
+  */
   client.loop();
 
   station_keeping_time = millis() - station_keeping_time_prev;

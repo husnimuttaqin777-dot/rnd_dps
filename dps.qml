@@ -6650,6 +6650,7 @@ Window {
         arrowkiribelakang_target.rotation = backend.steering3_target()
 		
 		if (backend.central_status() == "local"){
+			joy_text.text = "JOYSTICK:LOCAL"
 			arrowkananbelakang_target.visible = false;
 			arrowkiribelakang_target.visible = false;
 			arrowkanandepan_target.visible = false;
@@ -6657,6 +6658,7 @@ Window {
 		}
 		
 		if (backend.central_status() == "central"){
+			joy_text.text = "JOYSTICK:CENTRAL"
 			arrowkananbelakang_target.visible = true;
 			arrowkiribelakang_target.visible = true;
 			arrowkanandepan_target.visible = true;

@@ -8,6 +8,7 @@ import datetime as dt
 import numpy as np
 import csv
 import json
+import os
 
 
 from PyQt5.QtCore import * 
@@ -804,13 +805,6 @@ def find_speed_seacurrent(lat_ref, lon_ref):
 
 
 control_prop = ""
-waktu = dt.datetime.now()
-filename = str("DP Experimental RECORD " ) + str(current_time.day)+str("-")+str(current_time.month)+str("-")+str(current_time.year) + str(".csv")
-with open(filename, 'a') as csvfile:
-    csvwriter = csv.writer(csvfile)
-    rows = [ [str("date"),str("val latitude"), str("val longitude"), str("propeller speed1"), str("propeller speed2"), str("propeller speed3"), str("propeller speed4"), str("str1 target"), str("str2 target"), str("str3 target"), str("str4 target"), str("heading")
-              ,str("heading target"),str("mode"), str("position_error"), str("dir_error"), str("payout"), str("lat chute"),str("long chute") ]]
-    csvwriter.writerows(rows)
 
 
 previous_values = {'lat_index': None, 'y': None}
@@ -961,6 +955,33 @@ def dual_gps_heading(lat1, lon1, lat2, lon2):
     bearing_deg = (bearing_deg + 360) % 360
 
     return round(bearing_deg, 2)
+
+
+# Definisikan kolom sekali di awal (global atau di luar loop)
+CSV_COLUMNS = [
+    "waktu", "latitude", "longitude",
+    "propeller_speed1", "propeller_speed2", "propeller_speed3", "propeller_speed4",
+    "str1_target", "str2_target", "str3_target", "str4_target",
+    "heading", "heading_target", "navigation_mode_text",
+    "position_error", "dir_error", "payout", "lat_chute", "long_chute"
+]
+
+_header_written_for_date = None  # global tracker
+
+def log_to_csv(data_row):
+    global _header_written_for_date
+    waktu = dt.datetime.now()
+    today_str = f"{waktu.day}-{waktu.month}-{waktu.year}"
+    filename = f"DP Experimental RECORD {today_str}.csv"
+
+    if _header_written_for_date != today_str:
+        need_header = (not os.path.isfile(filename)) or (os.path.getsize(filename) == 0)
+        _header_written_for_date = today_str
+    else:
+        need_header = False
+
+    row_dict = dict(zip(CSV_COLUMNS, [waktu.strftime("%H:%M:%S")] + data_row))
+    pd.DataFrame([row_dict]).to_csv(filename, mode='a', header=need_header, index=False)
 
 
 ########## mengisi class table dengan instruksi pyqt5#############
@@ -2427,16 +2448,14 @@ class table(QObject):
         csv_message_time = time.time() - csv_message_time_prev
 
         if (csv_message_time > 2):
-            waktu = dt.datetime.now()
-            filename = str("DP Experimental RECORD " ) + str(current_time.day)+str("-")+str(current_time.month)+str("-")+str(current_time.year) + str(".csv")
-            with open(filename, 'a') as csvfile:
-                    csvwriter = csv.writer(csvfile)
-                    rows = [ [str(str(waktu.hour) + str(":") + str(waktu.minute)+ str(":") + str(waktu.second)),
-                              str(val_latitude), str(val_longitude), 
-                              str(round(propeller_speed1,0)), str(round(propeller_speed2,0)), str(round(propeller_speed3,0)), str(round(propeller_speed4,0)), 
-                              str(round(str1_target,0)), str(round(str2_target,0)), str(round(str3_target,0)), str(round(str4_target,0)),
-                              str(heading), str(heading_target), str(navigation_mode_text), str(position_error), str(dir_error), str(payout), str(lat_chute), str(long_chute)]]
-                    csvwriter.writerows(rows)
+            data_row = [
+                val_latitude, val_longitude,
+                round(propeller_speed1, 0), round(propeller_speed2, 0), round(propeller_speed3, 0), round(propeller_speed4, 0),
+                round(str1_target, 0), round(str2_target, 0), round(str3_target, 0), round(str4_target, 0),
+                heading, heading_target, navigation_mode_text,
+                position_error, dir_error, payout, lat_chute, long_chute
+            ]
+            log_to_csv(data_row)
 
             csv_message_time_prev = time.time()
 

@@ -678,6 +678,13 @@ rpm_filter = calib_param["rpm_filter"]
 k_propeller = (calib_param["k_propeller"])
 tau_propeller = (calib_param["tau_propeller"])
 
+steer_dir = (calib_param["steer_dir"])
+
+steer_status = ["S", "S", "S","S"]
+
+print("steer dir", steer_dir)
+
+
 
 speed_button = 0
 
@@ -821,7 +828,26 @@ def prev_val(var_name, input_val):
     previous_values[var_name] = input_val
     return result
 
+import json
 
+def change_dir_json(thruster_idx):
+    with open("config.json", "r") as f:
+        data = json.load(f)
+
+    current = data["steer_dir"][thruster_idx]
+
+    if current == "CW":
+        data["steer_dir"][thruster_idx] = "CCW"
+    else:
+        data["steer_dir"][thruster_idx] = "CW"
+
+    with open("config.json", "w") as f:
+        json.dump(data, f, indent=4)
+
+    print(
+        f"Thruster {thruster_idx+1}: "
+        f"{current} -> {data['steer_dir'][thruster_idx]}"
+    )
 
 
 def shortest_psi(psi_ref, psi_d):
@@ -830,6 +856,14 @@ def shortest_psi(psi_ref, psi_d):
     if (psi_shortest > 180):
         psi_shortest = psi_shortest - 360
     return psi_shortest   
+
+def steering_direction(error, direction, deadband=5):
+    if abs(error) <= deadband:
+        return "Tahan"
+    cmd = np.sign(error)
+    if direction == "CW":
+        cmd *= -1
+    return "Kiri" if cmd > 0 else "Kanan"
 
 
 def decimal_to_dms(decimal):
@@ -1465,13 +1499,7 @@ class table(QObject):
                 
                 
                 distance = meter_conversion(float(intersection[1]), float(intersection[0]), float(P[1]), float(P[0]))
-                #print(distance)
-                #print(intersection[1])
-                #print(rpl_long)
-        
-        
-        
-        #return y_est
+                
     
     @pyqtSlot(float, float, result=float)
     def estimate_depth(self, lat, lon):
@@ -1807,12 +1835,14 @@ class table(QObject):
         thruster_mode =str(value)
         #print(thruster_mode)
         
-        
+    '''
     @pyqtSlot('QString')
     def user_control(self, value):
         global user_control
         user_control = value
         print(user_control)
+    '''
+    
 
     
 
@@ -2416,6 +2446,59 @@ class table(QObject):
                         + str("\ne_error : ")+str(e_error)+ str("\nx_error : ")+str(x_error)+ str("\ny_error : ")+str(y_error))
 
 
+        '''
+        #if (central_status == "central"):
+            steer1_error = shortest_psi(steering1, steer1_req)
+            steer1 = steering_direction(steer1_error, steer_dir[0])
+
+            steer2_error = shortest_psi(steering2, steer2_req)
+            steer2 = steering_direction(steer2_error, steer_dir[1])
+
+            steer3_error = shortest_psi(steering3, steer3_req)
+            steer3 = steering_direction(steer3_error, steer_dir[2])
+
+            steer4_error = shortest_psi(steering4, steer4_req)
+            steer4 = steering_direction(steer4_error, steer_dir[3])
+
+            
+
+        if (steer1 != steer1_prev):
+            client.publish("steer1", steer1)
+
+        if (steer2 != steer2_prev):
+            client.publish("steer2", steer2)
+        
+        if (steer3 != steer3_prev):
+            client.publish("steer3", steer3)
+        
+        if (steer4 != steer4_prev):
+            client.publish("steer4", steer4)
+
+        if (abs(steer1_error_prev) > abs(steer1_error)):
+            change_dir_json(1)
+
+        if (abs(steer2_error_prev) > abs(steer2_error)):
+            change_dir_json(2)
+
+        if (abs(steer3_error_prev) > abs(steer3_error)):
+            change_dir_json(3)
+
+        if (abs(steer4_error_prev) > abs(steer4_error)):
+            change_dir_json(4)
+
+        steer1_prev = steer1
+        steer2_prev = steer2
+        steer3_prev = steer3
+        steer4_prev = steer4
+
+
+        steer1_error_prev = steer1_error
+        steer2_error_prev = steer2_error
+        steer3_error_prev = steer3_error
+        steer4_error_prev = steer4_error
+        '''
+        
+
         mqtt_message_time = time.time() - mqtt_message_time_prev
         
         if (mqtt_message_time > 1):  
@@ -2440,7 +2523,7 @@ class table(QObject):
             client.publish("steering4_calibrated", str(steering4_sensor))
 
 
-            client.publish("user_control", str(user_control))
+            #client.publish("user_control", str(user_control))
             client.publish("yaw_barge", str(heading_magneto))
             mqtt_message_time_prev = time.time()
 
@@ -2495,6 +2578,12 @@ def on_message(client, userdata, message):
         val =  1
     else:
         val = (msg)
+
+
+    if (t == "central_status"):
+        global central_status
+        central_status = msg
+        print(central_status)
         
         
     if (t == "payout"):
@@ -2731,9 +2820,6 @@ def on_message(client, userdata, message):
         propeller_speed4_buffer = int(msg)
 
     
-    if(t=='central_status'):
-        global central_status
-        central_status = msg
     
     if(t=='steer1_req'):
         global str1_target_buffer
@@ -2781,7 +2867,7 @@ if __name__ == "__main__":
     client.loop_start()
     print("Subscribing")
 
-
+    client.subscribe("central_status")
     client.subscribe("propeller1")
     client.subscribe("propeller2")
     client.subscribe("propeller3")
@@ -2868,7 +2954,6 @@ if __name__ == "__main__":
     client.subscribe("steer3_req")
     client.subscribe("steer4_req")
     
-    client.subscribe("central_status")
     
     client.subscribe("pitch_pontoon")
     client.subscribe("roll_pontoon")

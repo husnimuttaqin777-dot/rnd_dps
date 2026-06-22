@@ -1,11 +1,27 @@
+#include <Wire.h>
 
-#include <PubSubClient.h>
+#include <SPI.h>
 #include <LittleFS.h>
 #include <Ethernet.h>
+#include <PubSubClient.h>
 
 
+//#include  <TimerOne.h>   
+
+unsigned long message_time;
+unsigned long message_time_prev;
 
 
+unsigned long time_now;
+unsigned long time_elapsed;
+unsigned long time_prev;
+
+unsigned long time_send;
+unsigned long time_send_prev;
+int time_message = 1000;
+
+int val;
+// Update these with values suitable for your network.
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xE6 }; 
 
 IPAddress ip(123,45,0,101);
@@ -89,36 +105,6 @@ int propeller1_prev;
 int propeller2_prev;
 
 
-
-
-// ===== Reconnect ke MQTT broker =====
-EthernetClient ethClient;
-PubSubClient client(ethClient);
-void reconnect() {
-
-  while (!client.connected()) {
-    Serial.print("Menyambung ke MQTT broker...");
-    if (client.connect("PANEL1")) {
-      Serial.println("Terhubung ke MQTT!");
-      client.subscribe("lamp1");    // Subskrip topik
-      client.subscribe("central_mode");
-      client.subscribe("Steering_1");
-      client.subscribe("Steering_4");
-      client.subscribe("propeller1");
-      client.subscribe("propeller4");
-      client.subscribe("steering1_offset");
-      client.subscribe("steering4_offset");
-      client.publish("system", "WT32 online");  // Kirim status online
-    } else {
-      Serial.print("Gagal, rc=");
-      Serial.print(client.state());
-      Serial.println(" coba lagi 5 detik...");
-      delay(5000);
-    }
-  }
-}
-
-
 void saveConfig(float zone1, float zone2) {
   File file = LittleFS.open("/config.txt", "w");
   if (!file) {
@@ -175,58 +161,6 @@ void loadConfig() {
 
 
 
-
-
-
-
-// ===== Setup =====
-void setup() {
-  Serial.begin(115200);
-  if (!LittleFS.begin(true)) { 
-    Serial.println("LittleFS gagal mount");
-    return;
-  }
-  
-  Serial.println("LittleFS siap");
-  delay(1000);
-  Serial.println("Booting WT32-ETH01 MQTT...");
-
-  pinMode (10, OUTPUT);
-  Ethernet.init(10);  
-  Ethernet.begin(mac, ip);
-
-  Serial2Port.begin(9600, SERIAL_8N1, 5, 17); 
-
-  pinMode(MAX485_DE, OUTPUT);
-
-  // Init in receive mode
-
-  digitalWrite(MAX485_DE, 1);
-
-  //My slave uses 9600 baud
-  delay(10);
-  Serial.println("starting arduino: ");
-  Serial.println("setting up Serial ");
-  Serial.println("setting up RS485 port ");
-//  slave id
-  node.begin(1, Serial2Port);
-  node.preTransmission(preTransmission);
-  node.postTransmission(postTransmission);
-
-  Wire.begin(SDA_PIN, SCL_PIN); 
-  lcd.init();                      // initialize the lcd 
-  lcd.init();
-  // Print a message to the LCD.
-  lcd.backlight();
-  lcd.setCursor(0,0);
-  lcd.print("     PANEL 1");
-
-  loadConfig();
-
-}
-
-
-// ===== Callback saat MQTT menerima pesan =====
 void callback(char* topic, byte* message, unsigned int length) {
   /*
   Serial.print("Pesan [");
@@ -311,8 +245,6 @@ void callback(char* topic, byte* message, unsigned int length) {
 
   }
 
-
-
 // ===== Loop utama =====
 unsigned long lastMsg = 0;
 char analog1_send[10];
@@ -331,6 +263,94 @@ char rpm_engine_send[10];
 
 int boot;
 
+
+
+
+EthernetClient ethClient;
+PubSubClient client(ethClient);
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("PLC3_Client")) {
+      Serial.println("connected");
+      client.subscribe("lamp1");    // Subskrip topik
+      client.subscribe("central_mode");
+      client.subscribe("Steering_1");
+      client.subscribe("Steering_4");
+      client.subscribe("propeller1");
+      client.subscribe("propeller4");
+      client.subscribe("steering1_offset");
+      client.subscribe("steering4_offset");
+      client.publish("system", "WT32 online");  // Kirim status online
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+      
+    }
+  } 
+}
+
+
+
+void setup() {
+  Wire.begin();
+  Serial.begin(115200);
+
+  if (!LittleFS.begin(true)) { 
+    Serial.println("LittleFS gagal mount");
+    return;
+  }
+  
+  Serial.println("LittleFS siap");
+  delay(1000);
+  Serial.println("Booting WT32-ETH01 MQTT...");
+
+
+  Serial.println("booting....");
+  client.setServer(server, 1883);
+  client.setCallback(callback);
+
+  //esp32 pin 5
+  //arduino ethernet shield pin 10
+  pinMode (5, OUTPUT);
+  Ethernet.init(5);  
+  Ethernet.begin(mac, ip);
+
+  delay(1500);
+  Serial2Port.begin(9600, SERIAL_8N1, 16, 17); 
+  
+  
+
+  //My slave uses 9600 baud
+  delay(10);
+  Serial.println("starting arduino: ");
+  Serial.println("setting up Serial ");
+  Serial.println("setting up RS485 port ");
+//  slave id
+  node.begin(1, Serial2Port);
+  node.preTransmission(preTransmission);
+  node.postTransmission(postTransmission);
+
+  Wire.begin(SDA_PIN, SCL_PIN); 
+  lcd.init();                      // initialize the lcd 
+  lcd.init();
+  // Print a message to the LCD.
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("     PANEL 1");
+
+  loadConfig();
+  
+
+}
+
+
+static char yaw_send[15];
 void loop() {
 
   if (!client.connected()) {

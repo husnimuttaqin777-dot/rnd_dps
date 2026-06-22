@@ -2537,10 +2537,8 @@ class table(QObject):
                 position_error, dir_error, payout, lat_chute, long_chute
             ]
             log_to_csv(data_row)
-            date = dt.datetime.strptime(
-                    "2026-06-08 14:41:33",
-                    "%Y-%m-%d %H:%M:%S"
-                )
+            date = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
             new_barge = {
                 "latitude": str(val_latitude),
                 "longitude": str(val_longitude),

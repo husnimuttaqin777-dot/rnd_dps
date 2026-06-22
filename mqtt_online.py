@@ -37,7 +37,7 @@ def on_connect(client, userdata, flags, rc):
         client.subscribe("dps_syergie_mqtt/sensor")
         client.subscribe("dps_syergie_mqtt/tug1")
         client.subscribe("dps_syergie_mqtt/tug2")
-        client.subscribe("dps_syergie_mqtt/barge")
+        #client.subscribe("dps_syergie_mqtt/barge")
        
 
     else:
@@ -123,12 +123,14 @@ if __name__ == "__main__":
     try:
 
         while True:
-            '''
+            
             with open("position.json", "r") as f:
-                calib_param = json.load(f)
+                position = json.load(f)
 
-            steering1_offset = (calib_param["steering1_offset"])
-            '''
+            print(position["barge"])
+            payload = json.dumps(position["barge"])
+
+            client.publish("dps_syergie_mqtt/barge", payload)
             time.sleep(1)
 
     except KeyboardInterrupt:

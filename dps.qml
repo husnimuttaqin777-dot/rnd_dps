@@ -6676,7 +6676,7 @@ Window {
 		
 		
 
-		compass_val.text =  "<font color='gold'>" + slider.value + "</font>"
+		compass_val.text =  "<font color='gold'>" + backend.headingship() + "</font>"
 		
 		compass.value = backend.headingship()
 		

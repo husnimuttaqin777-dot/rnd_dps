@@ -33,7 +33,7 @@ import threading
 
 
 
-isobath_file = "isobath_batam.csv"
+isobath_file = "isobath_dumai.csv"
 
 
 intersection_points = []
@@ -441,9 +441,9 @@ long_slope = 0
 slope = 0
 
 
-val_latitude =  1.153461 #centre
+val_latitude =  1.6533388071438695 #centre
 filtered_val_latitude = val_latitude#centre
-val_longitude = 103.894775   #centre
+val_longitude = 101.51929189617022   #centre
 filtered_val_longitude = filtered_val_latitude  #centre
 
 lat_front = 0
@@ -661,6 +661,16 @@ steering2_raw = 0
 steering3_raw = 0
 steering4_raw = 0
 
+steer1_error = 0
+steer2_error = 0
+steer3_error = 0
+steer4_error = 0
+
+steer1_error_prev = 0
+steer2_error_prev = 0
+steer3_error_prev = 0
+steer4_error_prev = 0
+
 
 with open("calib_param.json", "r") as f:
     calib_param = json.load(f)
@@ -828,10 +838,9 @@ def prev_val(var_name, input_val):
     previous_values[var_name] = input_val
     return result
 
-import json
 
 def change_dir_json(thruster_idx):
-    with open("config.json", "r") as f:
+    with open("calib_param.json", "r") as f:
         data = json.load(f)
 
     current = data["steer_dir"][thruster_idx]
@@ -841,13 +850,13 @@ def change_dir_json(thruster_idx):
     else:
         data["steer_dir"][thruster_idx] = "CW"
 
-    with open("config.json", "w") as f:
+    with open("calib_param.json", "w") as f:
         json.dump(data, f, indent=4)
 
-    print(
-        f"Thruster {thruster_idx+1}: "
-        f"{current} -> {data['steer_dir'][thruster_idx]}"
-    )
+    return data["steer_dir"]
+    #steer_dir = (calib_param["steer_dir"])
+
+    
 
 
 def shortest_psi(psi_ref, psi_d):
@@ -2251,6 +2260,8 @@ class table(QObject):
         global lat_chute, backend
         global steering1_offset, steering2_offset, steering3_offset, steering4_offset, steering1_sensor, steering2_sensor, steering3_sensor, steering4_sensor
         global calib_param
+        global steer1_error,steer2_error,steer3_error,steer4_error
+        global steer1_error_prev,steer2_error_prev,steer3_error_prev,steer4_error_prev
 
 
         with open("position.json", "r") as file:
@@ -2462,40 +2473,27 @@ class table(QObject):
 
             
 
-        if (steer1 != steer1_prev):
-            client.publish("steer1", steer1)
+            if (steer1 != steer1_prev):
+                client.publish("steer1", steer1)
 
-        if (steer2 != steer2_prev):
-            client.publish("steer2", steer2)
+            if (steer2 != steer2_prev):
+                client.publish("steer2", steer2)
+            
+            if (steer3 != steer3_prev):
+                client.publish("steer3", steer3)
+            
+            if (steer4 != steer4_prev):
+                client.publish("steer4", steer4)
+
+            
+
+            steer1_prev = steer1
+            steer2_prev = steer2
+            steer3_prev = steer3
+            steer4_prev = steer4
+
+
         
-        if (steer3 != steer3_prev):
-            client.publish("steer3", steer3)
-        
-        if (steer4 != steer4_prev):
-            client.publish("steer4", steer4)
-
-        if (abs(steer1_error_prev) > abs(steer1_error)):
-            change_dir_json(1)
-
-        if (abs(steer2_error_prev) > abs(steer2_error)):
-            change_dir_json(2)
-
-        if (abs(steer3_error_prev) > abs(steer3_error)):
-            change_dir_json(3)
-
-        if (abs(steer4_error_prev) > abs(steer4_error)):
-            change_dir_json(4)
-
-        steer1_prev = steer1
-        steer2_prev = steer2
-        steer3_prev = steer3
-        steer4_prev = steer4
-
-
-        steer1_error_prev = steer1_error
-        steer2_error_prev = steer2_error
-        steer3_error_prev = steer3_error
-        steer4_error_prev = steer4_error
         '''
         
 
@@ -2539,6 +2537,48 @@ class table(QObject):
                 position_error, dir_error, payout, lat_chute, long_chute
             ]
             log_to_csv(data_row)
+            date = dt.datetime.strptime(
+                    "2026-06-08 14:41:33",
+                    "%Y-%m-%d %H:%M:%S"
+                )
+            new_barge = {
+                "latitude": str(val_latitude),
+                "longitude": str(val_longitude),
+                "heading": str(heading_magneto),
+                "received_time": str(date)
+            }
+            # baca file
+            with open("position.json", "r") as f:
+                data = json.load(f)
+
+            # replace data barge
+            data["barge"] = new_barge
+
+            # simpan kembali
+            with open("position.json", "w") as f:
+                json.dump(data, f, indent=4)
+
+
+
+            '''
+            if abs(steer1_error_prev) > abs(steer1_error) and steer1 not ("Tahan"):
+                steer_dir = change_dir_json(1)
+
+            if (abs(steer2_error_prev) > abs(steer2_error)):
+                steer_dir = change_dir_json(2)
+
+            if (abs(steer3_error_prev) > abs(steer3_error)):
+                steer_dir = change_dir_json(3)
+
+            if (abs(steer4_error_prev) > abs(steer4_error)):
+                steer_dir = change_dir_json(4)
+
+            steer1_error_prev = steer1_error
+            steer2_error_prev = steer2_error
+            steer3_error_prev = steer3_error
+            steer4_error_prev = steer4_error
+            '''
+            
 
             csv_message_time_prev = time.time()
 

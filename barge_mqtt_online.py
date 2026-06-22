@@ -14,6 +14,7 @@ import time
 import json
 import datetime
 
+
 # ----------------------------------------------------------------
 # MQTT CONFIG
 # ----------------------------------------------------------------
@@ -122,7 +123,12 @@ if __name__ == "__main__":
     try:
 
         while True:
-            print("loop")
+            '''
+            with open("position.json", "r") as f:
+                calib_param = json.load(f)
+
+            steering1_offset = (calib_param["steering1_offset"])
+            '''
             time.sleep(1)
 
     except KeyboardInterrupt:

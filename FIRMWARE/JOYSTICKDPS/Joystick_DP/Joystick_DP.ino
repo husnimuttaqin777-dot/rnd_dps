@@ -35,11 +35,11 @@ static char steer3_command_send[10];
 static char steer4_command_send[10];
 
 char buf[10];
-const char* motor1Publish = "Steering_1";
-const char* motor2Publish = "Steering_2";
+const char* motor1Publish = "Steering_1_joystick";
+const char* motor2Publish = "Steering_2_joystick";
 
-const char* motor3Publish = "Steering_3";
-const char* motor4Publish = "Steering_4";
+const char* motor3Publish = "Steering_3_joystick";
+const char* motor4Publish = "Steering_4_joystick";
 const char* motor5Publish = "Steering_Central Kiri";
 const char* motor6Publish = "Steering_Central Kanan";
 

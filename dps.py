@@ -2621,7 +2621,7 @@ def on_message(client, userdata, message):
     if (t == "central_status"):
         global central_status
         central_status = msg
-        print(central_status)
+        #print(central_status)
         
         
     if (t == "payout"):
@@ -2884,6 +2884,23 @@ def on_message(client, userdata, message):
         #if(central_status == "central"):
         if (user_control == "manual"):
             str4_target_buffer = int(msg)
+
+    if(t=='Steering_1_joystick'):
+        print(msg)
+        client.publish("steering_1", str(msg))
+
+    if(t=='Steering_2_joystick'):
+        print(msg)
+        client.publish("steering_2", str(msg))
+
+    if(t=='Steering_3_joystick'):
+        print(msg)
+        client.publish("steering_3", str(msg))
+
+    if(t=='Steering_4_joystick'):
+        print(msg)
+        client.publish("steering_4", str(msg))
+    
         
     
 
@@ -2931,6 +2948,12 @@ if __name__ == "__main__":
     client.subscribe("steering2_sensor")
     client.subscribe("steering3_sensor")
     client.subscribe("steering4_sensor")
+
+    client.subscribe("Steering_1_joystick")
+    client.subscribe("Steering_2_joystick")
+    client.subscribe("Steering_3_joystick")
+    client.subscribe("Steering_4_joystick")
+
 
     client.subscribe("SPC1")
     client.subscribe("SPC2")

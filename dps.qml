@@ -417,7 +417,7 @@ Window {
                 activeMapType: supportedMapTypes[1]
 
                 //center: QtPositioning.coordinate(latitude_position_value.text, longitude_position_value.text)
-                center: QtPositioning.coordinate(1.1507294619859862 , 103.90762283001442)
+                center: QtPositioning.coordinate(1.6531739954186195 , 101.51870957698065)
 				//center: QtPositioning.coordinate(latitude_position_value.text, longitude_position_value.text)
 				gesture.enabled: true
                 gesture.acceptedGestures: MapGestureArea.PinchGesture | MapGestureArea.PanGesture

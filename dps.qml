@@ -2464,6 +2464,23 @@ Window {
 				border.color : "orange"//line_color
 				border.width : 4
 				radius : width/2
+
+				/*
+				Text {
+					id : steer1_dir
+					//anchors.horizontalCenter: parent.horizontalCenter
+					x : steering1_status.width
+					y: -rpm1.height*2.5//prop1_text.height + gov1.height +gov1.height/5 + speed1.height
+					color: "#e94e06"
+					text: "<"
+					font.pixelSize: parent.height/2
+					font.styleName: "Bold"
+					font.weight: Font.Bold
+
+				}
+				
+				*/
+				
 				
 				
 				Text {

@@ -9,7 +9,6 @@ def shortest_psi(psi_ref, psi_d):
     return psi_shortest   
 
 def steering_direction(error, direction, deadband=5):
-
     if abs(error) <= deadband:
         return "S"
     cmd = np.sign(error)
@@ -18,5 +17,6 @@ def steering_direction(error, direction, deadband=5):
 
     return "L" if cmd > 0 else "R"
 
+error = (shortest_psi(10,0))
 
-print(steering_direction(-7, steer_dir[2]))
+print(steering_direction(error, steer_dir[0]))

@@ -1,16 +1,16 @@
 {
-    "steering1_offset": 90,
+    "steering1_offset": 61,
     "steering2_offset": 0,
     "steering3_offset": -230,
     "steering4_offset": 0,
     "steering_raw_min": [
-        0,
+        355,
         0,
         0,
         0
     ],
     "steering_raw_max": [
-        358,
+        0,
         360,
         360,
         358
@@ -33,7 +33,7 @@
         33.000000000023185,
         5.002493150582942
     ],
-    "steer_dir":[
+    "steer_dir": [
         "CW",
         "CW",
         "CW",

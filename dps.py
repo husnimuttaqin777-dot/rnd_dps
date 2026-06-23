@@ -198,6 +198,20 @@ def identification(x, y):
     return K, tau
 
 
+def dir_check(command, direction):
+    if ((command == "Kiri" or command == "Kanan")):
+        if (direction == "CCW"):
+            if (command == "Kanan"):
+                return "Kiri"
+            if (command == "Kiri"):
+                return "Kanan"
+    
+        else:
+            return command
+    else:
+        return command
+    
+
 
 rpl1_lat = [1.153244444444444, 1.1533, 1.153038888888889, 1.152772222222222, 1.152508333333333, 1.152022222222222, 1.151761111111111, 1.151686111111111, 1.151613888888889, 1.151258333333333, 1.151258333333333, 1.150755555555556, 1.150252777777778, 1.149750833333333, 1.149247222222222, 1.148697222222222, 1.148022222222222, 1.146836111111111, 1.145575, 1.144311111111111, 1.14305, 1.141786111111111, 1.140561111111111, 1.139358333333333, 1.139241666666667, 1.139069444444444]
 
@@ -2262,7 +2276,7 @@ class table(QObject):
         global calib_param
         global steer1_error,steer2_error,steer3_error,steer4_error
         global steer1_error_prev,steer2_error_prev,steer3_error_prev,steer4_error_prev
-
+        global steer_dir
 
         with open("position.json", "r") as file:
             data = json.load(file)
@@ -2457,8 +2471,8 @@ class table(QObject):
                         + str("\ne_error : ")+str(e_error)+ str("\nx_error : ")+str(x_error)+ str("\ny_error : ")+str(y_error))
 
 
-        '''
-        #if (central_status == "central"):
+        
+        if (central_status == "central"):
             steer1_error = shortest_psi(steering1, steer1_req)
             steer1 = steering_direction(steer1_error, steer_dir[0])
 
@@ -2474,16 +2488,16 @@ class table(QObject):
             
 
             if (steer1 != steer1_prev):
-                client.publish("steer1", steer1)
+                client.publish("Steering_1", steer1)
 
             if (steer2 != steer2_prev):
-                client.publish("steer2", steer2)
+                client.publish("Steering_2", steer2)
             
             if (steer3 != steer3_prev):
-                client.publish("steer3", steer3)
+                client.publish("Steering_3", steer3)
             
             if (steer4 != steer4_prev):
-                client.publish("steer4", steer4)
+                client.publish("Steering_4", steer4)
 
             
 
@@ -2494,7 +2508,7 @@ class table(QObject):
 
 
         
-        '''
+        
         
 
         mqtt_message_time = time.time() - mqtt_message_time_prev
@@ -2556,27 +2570,10 @@ class table(QObject):
             with open("position.json", "w") as f:
                 json.dump(data, f, indent=4)
 
+            with open("calib_param.json", "r") as f:
+                calib_param = json.load(f)
 
-
-            '''
-            if abs(steer1_error_prev) > abs(steer1_error) and steer1 not ("Tahan"):
-                steer_dir = change_dir_json(1)
-
-            if (abs(steer2_error_prev) > abs(steer2_error)):
-                steer_dir = change_dir_json(2)
-
-            if (abs(steer3_error_prev) > abs(steer3_error)):
-                steer_dir = change_dir_json(3)
-
-            if (abs(steer4_error_prev) > abs(steer4_error)):
-                steer_dir = change_dir_json(4)
-
-            steer1_error_prev = steer1_error
-            steer2_error_prev = steer2_error
-            steer3_error_prev = steer3_error
-            steer4_error_prev = steer4_error
-            '''
-            
+            steer_dir = (calib_param["steer_dir"])
 
             csv_message_time_prev = time.time()
 
@@ -2887,19 +2884,20 @@ def on_message(client, userdata, message):
 
     if(t=='Steering_1_joystick'):
         print(msg)
-        client.publish("steering_1", str(msg))
+        client.publish("Steering_1", str(dir_check(str(msg), steer_dir[0])))
+
 
     if(t=='Steering_2_joystick'):
         print(msg)
-        client.publish("steering_2", str(msg))
+        client.publish("Steering_2", str(dir_check(str(msg), steer_dir[1])))
 
     if(t=='Steering_3_joystick'):
         print(msg)
-        client.publish("steering_3", str(msg))
+        client.publish("Steering_3", str(dir_check(str(msg), steer_dir[2])))
 
     if(t=='Steering_4_joystick'):
         print(msg)
-        client.publish("steering_4", str(msg))
+        client.publish("Steering_4", str(dir_check(str(msg), steer_dir[3])))
     
         
     

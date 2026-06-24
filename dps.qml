@@ -5177,7 +5177,27 @@ Window {
 
 				}
 
+				Button{
+					x : 400
+					y : 250
+					text : "Change Dir 1"
+				}
+				Button{
+					x : 400
+					y : 300
+					text : "Change Dir 2"
+				}
 
+				Button{
+					x : 400
+					y : 350
+					text : "Change Dir 3"
+				}
+				Button{
+					x : 400
+					y : 400
+					text : "Change Dir 4"
+				}
 
 		}
 

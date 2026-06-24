@@ -5177,26 +5177,53 @@ Window {
 
 				}
 
+
+				Text{
+					id : steer_dir
+					x : 500
+					y : 250
+
+					text : "scale 4 : "
+					font.pixelSize : 16
+					color : line_color
+					font.family: "Helvetica"
+
+				}
+
+
 				Button{
 					x : 400
 					y : 250
 					text : "Change Dir 1"
+
+					onClicked:{
+						backend.change_dir(0)
+					}
 				}
 				Button{
 					x : 400
 					y : 300
 					text : "Change Dir 2"
+					onClicked:{
+						backend.change_dir(1)
+					}
 				}
 
 				Button{
 					x : 400
 					y : 350
 					text : "Change Dir 3"
+					onClicked:{
+						backend.change_dir(2)
+					}
 				}
 				Button{
 					x : 400
 					y : 400
 					text : "Change Dir 4"
+					onClicked:{
+						backend.change_dir(3)
+					}
 				}
 
 		}
@@ -6486,6 +6513,8 @@ Window {
 		repeat: true
 		running: true
 		onTriggered: {
+
+			steer_dir.text = backend.steer_dir()
 
 
 			//console.log(backend.tau_propeller())

@@ -868,7 +868,6 @@ def change_dir_json(thruster_idx):
         json.dump(data, f, indent=4)
 
     return data["steer_dir"]
-    #steer_dir = (calib_param["steer_dir"])
 
     
 
@@ -1134,6 +1133,8 @@ class table(QObject):
 
     
 
+    
+
     def on_update_finished(self):
 
         global lat_seacurrent
@@ -1306,6 +1307,9 @@ class table(QObject):
 
     @pyqtSlot(result=str)
     def est(self):  return str(est)
+
+    @pyqtSlot(result=str)
+    def steer_dir(self):  return str(steer_dir)
     
     @pyqtSlot(str)
     def heading_method_setting(self, method):
@@ -1344,6 +1348,16 @@ class table(QObject):
             json.dump(calib_param, f, indent=4)
 
     
+
+
+
+    @pyqtSlot(int)
+    def change_dir(self, cmd):
+        change_dir_json(cmd)
+
+    
+        
+
 
     @pyqtSlot(str)
     def identification2(self, file):

@@ -2555,17 +2555,22 @@ class table(QObject):
 
             
 
-            if (steer1 != steer1_prev):
-                client.publish("Steering_1", str(dir_check(steer1, steer_dir[0])))
+        if (steer1 != steer1_prev):
+            client.publish("Steering_1", str(dir_check(steer1, steer_dir[0])))
 
-            if (steer2 != steer2_prev):
-                client.publish("Steering_2", str(dir_check(steer2, steer_dir[1])))
-            
-            if (steer3 != steer3_prev):
-                client.publish("Steering_3", str(dir_check(steer3, steer_dir[2])))
-            
-            if (steer4 != steer4_prev):
-                client.publish("Steering_4", str(dir_check(steer4, steer_dir[3])))
+        if (steer2 != steer2_prev):
+            client.publish("Steering_2", str(dir_check(steer2, steer_dir[1])))
+        
+        if (steer3 != steer3_prev):
+            client.publish("Steering_3", str(dir_check(steer3, steer_dir[2])))
+        
+        if (steer4 != steer4_prev):
+            client.publish("Steering_4", str(dir_check(steer4, steer_dir[3])))
+
+        steer1_prev = steer1
+        steer2_prev = steer2
+        steer3_prev = steer3
+        steer4_prev = steer4
 
         if (central_status_prev != central_status):
             if (central_status == "local"):
@@ -2573,16 +2578,6 @@ class table(QObject):
                 steer2 = "Tahan"
                 steer3 = "Tahan"
                 steer4 = "Tahan"
-
-                client.publish("Steering_1", "Tahan")
-                client.publish("Steering_2", "Tahan")
-                client.publish("Steering_3", "Tahan")
-                client.publish("Steering_4", "Tahan")
-
-        steer1_prev = steer1
-        steer2_prev = steer2
-        steer3_prev = steer3
-        steer4_prev = steer4
 
         central_status_prev = central_status
 
@@ -2933,23 +2928,23 @@ def on_message(client, userdata, message):
     if(t=='Steering_1_joystick'):
         global steer1
         steer1 = msg
-        client.publish("Steering_1", str(dir_check(steer1, steer_dir[0])))
+        
 
 
     if(t=='Steering_2_joystick'):
         global steer2
         steer2 = msg
-        client.publish("Steering_2", str(dir_check(steer2, steer_dir[1])))
+        
 
     if(t=='Steering_3_joystick'):
         global steer3
         steer3 = msg
-        client.publish("Steering_3", str(dir_check(steer3, steer_dir[2])))
+        
 
     if(t=='Steering_4_joystick'):
         global steer4
         steer4 = msg
-        client.publish("Steering_4", str(dir_check(steer4, steer_dir[3])))
+      
     
         
     

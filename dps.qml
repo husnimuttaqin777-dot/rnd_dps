@@ -2465,12 +2465,11 @@ Window {
 				border.width : 4
 				radius : width/2
 
-				/*
+				
 				Text {
 					id : steer1_dir
-					//anchors.horizontalCenter: parent.horizontalCenter
-					x : steering1_status.width
-					y: -rpm1.height*2.5//prop1_text.height + gov1.height +gov1.height/5 + speed1.height
+					anchors.horizontalCenter: parent.horizontalCenter
+					y: -rpm1.height*2.5
 					color: "#e94e06"
 					text: "<"
 					font.pixelSize: parent.height/2
@@ -2479,7 +2478,7 @@ Window {
 
 				}
 				
-				*/
+				
 				
 				
 				
@@ -2565,6 +2564,19 @@ Window {
 				border.width : 4
 				radius : width/2
 				
+
+				Text {
+					id : steer2_dir
+					anchors.horizontalCenter: parent.horizontalCenter
+					y: -rpm2.height*2.5
+					color: "#e94e06"
+					text: "<"
+					font.pixelSize: parent.height/2
+					font.styleName: "Bold"
+					font.weight: Font.Bold
+
+				}
+				
 				
 				Text {
                 id : rpm2
@@ -2641,6 +2653,20 @@ Window {
 				border.color : "navy"//line_color
 				border.width : 4
 				radius : width/2
+
+
+				Text {
+					id : steer3_dir
+					anchors.horizontalCenter: parent.horizontalCenter
+					y: -rpm3.height*2.5
+					color: "#e94e06"
+					text: "<"
+					font.pixelSize: parent.height/2
+					font.styleName: "Bold"
+					font.weight: Font.Bold
+
+				}
+				
 				
 				Text {
                 id : rpm3
@@ -2729,6 +2755,19 @@ Window {
 					font.styleName: "Bold"
 					font.weight: Font.Bold
 				}
+
+				Text {
+					id : steer4_dir
+					anchors.horizontalCenter: parent.horizontalCenter
+					y: -rpm4.height*2.5
+					color: "#e94e06"
+					text: "<"
+					font.pixelSize: parent.height/2
+					font.styleName: "Bold"
+					font.weight: Font.Bold
+
+				}
+				
 				
 				
 				Text {
@@ -6463,11 +6502,9 @@ Window {
 					}
 				`, map, "Line2_" + j);
 				map.addMapItem(line);
+			}					
+					
 			}
-
-					
-					
-					}
 
 
 
@@ -6478,6 +6515,8 @@ Window {
 		running: true
 		onTriggered: {
 			
+
+
 			//backend.estimate_depth(latitude_rov_value.text, longitude_rov_value.text)
 			backend.estimate_depth((latitude_position_value.text), (longitude_position_value.text))
 			
@@ -6513,6 +6552,56 @@ Window {
 		repeat: true
 		running: true
 		onTriggered: {
+			//console.log(backend.steer1())
+
+			if (backend.steer1() == "Kanan"){
+				steer1_dir.text = ">" 
+			}
+
+			if (backend.steer1() == "Tahan"){
+				steer1_dir.text = "X" 
+			}
+
+			if (backend.steer1() == "Kiri"){
+				steer1_dir.text = "<" 
+			}
+
+
+			if (backend.steer2() == "Kanan"){
+				steer2_dir.text = ">" 
+			}
+
+			if (backend.steer2() == "Tahan"){
+				steer2_dir.text = "X" 
+			}
+
+			if (backend.steer2() == "Kiri"){
+				steer2_dir.text = "<" 
+			}
+
+			if (backend.steer3() == "Kanan"){
+				steer3_dir.text = ">" 
+			}
+
+			if (backend.steer3() == "Tahan"){
+				steer3_dir.text = "X" 
+			}
+
+			if (backend.steer3() == "Kiri"){
+				steer3_dir.text = "<" 
+			}
+
+			if (backend.steer4() == "Kanan"){
+				steer4_dir.text = ">" 
+			}
+
+			if (backend.steer4() == "Tahan"){
+				steer4_dir.text = "X" 
+			}
+
+			if (backend.steer4() == "Kiri"){
+				steer4_dir.text = "<" 
+			}
 
 			steer_dir.text = backend.steer_dir()
 

@@ -211,7 +211,20 @@ def dir_check(command, direction):
     else:
         return command
     
+steer1 = "Tahan" 
+steer2 = "Tahan"
+steer3 = "Tahan"
+steer4 = "Tahan"
 
+steer1_prev = "Tahan"
+steer2_prev = "Tahan"
+steer3_prev = "Tahan"
+steer4_prev = "Tahan"
+
+steer1_req = 0
+steer2_req = 0
+steer3_req = 0
+steer4_req = 0
 
 rpl1_lat = [1.153244444444444, 1.1533, 1.153038888888889, 1.152772222222222, 1.152508333333333, 1.152022222222222, 1.151761111111111, 1.151686111111111, 1.151613888888889, 1.151258333333333, 1.151258333333333, 1.150755555555556, 1.150252777777778, 1.149750833333333, 1.149247222222222, 1.148697222222222, 1.148022222222222, 1.146836111111111, 1.145575, 1.144311111111111, 1.14305, 1.141786111111111, 1.140561111111111, 1.139358333333333, 1.139241666666667, 1.139069444444444]
 
@@ -741,6 +754,7 @@ select4 = False
 
 
 central_status = "local"
+central_status_prev = "local"
 
 sway_dir = "left"
 
@@ -1855,6 +1869,18 @@ class table(QObject):
     
     @pyqtSlot(result=str)
     def long_front(self):return str(long_front)
+
+    @pyqtSlot(result=str)
+    def steer1(self):return str(steer1)
+
+    @pyqtSlot(result=str)
+    def steer2(self):return str(steer2)
+
+    @pyqtSlot(result=str)
+    def steer3(self):return str(steer3)
+
+    @pyqtSlot(result=str)
+    def steer4(self):return str(steer4)
     
 
     @pyqtSlot(str)
@@ -2288,9 +2314,12 @@ class table(QObject):
         global lat_chute, backend
         global steering1_offset, steering2_offset, steering3_offset, steering4_offset, steering1_sensor, steering2_sensor, steering3_sensor, steering4_sensor
         global calib_param
+        global steer1, steer2, steer3, steer4, steer1_prev, steer2_prev, steer3_prev, steer4_prev 
         global steer1_error,steer2_error,steer3_error,steer4_error
         global steer1_error_prev,steer2_error_prev,steer3_error_prev,steer4_error_prev
         global steer_dir
+
+        global central_status_prev, central_status
 
         with open("position.json", "r") as file:
             data = json.load(file)
@@ -2487,38 +2516,75 @@ class table(QObject):
 
         
         if (central_status == "central"):
-            steer1_error = shortest_psi(steering1, steer1_req)
-            steer1 = steering_direction(steer1_error, steer_dir[0])
+            steer1_error = shortest_psi(steering1_sensor, str1_target_buffer)
+            if (abs(steer1_error) > 5):
+                if (steer1_error > 0):
+                    steer1 = "Kanan"
+                else:
+                    steer1 = "Kiri"
+            else:
+                steer1 = "Tahan"
 
-            steer2_error = shortest_psi(steering2, steer2_req)
-            steer2 = steering_direction(steer2_error, steer_dir[1])
 
-            steer3_error = shortest_psi(steering3, steer3_req)
-            steer3 = steering_direction(steer3_error, steer_dir[2])
+            steer2_error = shortest_psi(steering2_sensor, str2_target_buffer)
+            if (abs(steer2_error) > 5):
+                if (steer2_error > 0):
+                    steer2 = "Kanan"
+                else:
+                    steer2 = "Kiri"
+            else:
+                steer2 = "Tahan"
 
-            steer4_error = shortest_psi(steering4, steer4_req)
-            steer4 = steering_direction(steer4_error, steer_dir[3])
+            steer3_error = shortest_psi(steering3_sensor, str3_target_buffer)
+            if (abs(steer3_error) > 5):
+                if (steer3_error > 0):
+                    steer3 = "Kanan"
+                else:
+                    steer3 = "Kiri"
+            else:
+                steer3 = "Tahan"
+
+            steer4_error = shortest_psi(steering4_sensor, str4_target_buffer)
+            if (abs(steer4_error) > 5):
+                if (steer4_error > 0):
+                    steer4 = "Kanan"
+                else:
+                    steer4 = "Kiri"
+            else:
+                steer4 = "Tahan"
 
             
 
             if (steer1 != steer1_prev):
-                client.publish("Steering_1", steer1)
+                client.publish("Steering_1", str(dir_check(steer1, steer_dir[0])))
 
             if (steer2 != steer2_prev):
-                client.publish("Steering_2", steer2)
+                client.publish("Steering_2", str(dir_check(steer2, steer_dir[1])))
             
             if (steer3 != steer3_prev):
-                client.publish("Steering_3", steer3)
+                client.publish("Steering_3", str(dir_check(steer3, steer_dir[2])))
             
             if (steer4 != steer4_prev):
-                client.publish("Steering_4", steer4)
+                client.publish("Steering_4", str(dir_check(steer4, steer_dir[3])))
 
-            
+        if (central_status_prev != central_status):
+            if (central_status == "local"):
+                steer1 = "Tahan"
+                steer2 = "Tahan"
+                steer3 = "Tahan"
+                steer4 = "Tahan"
 
-            steer1_prev = steer1
-            steer2_prev = steer2
-            steer3_prev = steer3
-            steer4_prev = steer4
+                client.publish("Steering_1", "Tahan")
+                client.publish("Steering_2", "Tahan")
+                client.publish("Steering_3", "Tahan")
+                client.publish("Steering_4", "Tahan")
+
+        steer1_prev = steer1
+        steer2_prev = steer2
+        steer3_prev = steer3
+        steer4_prev = steer4
+
+        central_status_prev = central_status
 
 
         
@@ -2757,39 +2823,11 @@ def on_message(client, userdata, message):
  
     if (t == "yaw_actual"):
         global heading_magneto
-        
-        #try:
-            # y =ax^2 + bx + c
+
         value = float(msg)
         
-        '''
-        if (value > 0 and value <= 90):
-            heading_magneto = map_value(value, 0,90, 9,103)
-        
-        if (value > 90 and value <= 180):
-            heading_magneto = map_value(value,90,180,103, 182)
-                
-        if (value > 180 and value <= 270):
-            heading_magneto = map_value(value,180, 270, 182, 315)
-        
-        if (value > 270 and value <= 330):
-            heading_magneto = map_value(value,270,330, 316, 355)
-        
-        if (value > 330 and value <= 347):
-            heading_magneto = map_value(value,330,347, 355, 359)
-        
-        if (value > 347 and value <= 348):
-            heading_magneto = map_value(value,347,348, 359, 0)
-        
-        if (value > 348 and value <= 359):
-            heading_magneto = map_value(value,348,359, 0, 8)
-        '''               
-        #heading_magneto = int(heading_magneto)  # default jika tidak masuk range manapun
         heading_magneto = int(value)
-        #    print (value)
-        #except (TypeError, ValueError):
-        #    print(f"Invalid heading value: {msg}")
-        #    heading = 0  # atau nilai default lain sesuai kebutuhan
+
             
             
     if (t == "cog"):
@@ -2873,13 +2911,11 @@ def on_message(client, userdata, message):
     if(t=='steer1_req'):
         global str1_target_buffer
         if (user_control == "manual"):
-        #if(central_status == "central"):
             str1_target_buffer = int(msg)
             #print(msg)
     
     if(t=='steer2_req'):
         global str2_target_buffer
-        #if(central_status == "central"):
         if (user_control == "manual"):
             str2_target_buffer = int(msg)
         
@@ -2887,31 +2923,33 @@ def on_message(client, userdata, message):
     if(t=='steer3_req'):
         global str3_target_buffer
         if (user_control == "manual"):
-        #if(central_status == "central"):
             str3_target_buffer = int(msg)
         
     if(t=='steer4_req'):
         global str4_target_buffer
-        #if(central_status == "central"):
         if (user_control == "manual"):
             str4_target_buffer = int(msg)
 
     if(t=='Steering_1_joystick'):
-        print(msg)
-        client.publish("Steering_1", str(dir_check(str(msg), steer_dir[0])))
+        global steer1
+        steer1 = msg
+        client.publish("Steering_1", str(dir_check(steer1, steer_dir[0])))
 
 
     if(t=='Steering_2_joystick'):
-        print(msg)
-        client.publish("Steering_2", str(dir_check(str(msg), steer_dir[1])))
+        global steer2
+        steer2 = msg
+        client.publish("Steering_2", str(dir_check(steer2, steer_dir[1])))
 
     if(t=='Steering_3_joystick'):
-        print(msg)
-        client.publish("Steering_3", str(dir_check(str(msg), steer_dir[2])))
+        global steer3
+        steer3 = msg
+        client.publish("Steering_3", str(dir_check(steer3, steer_dir[2])))
 
     if(t=='Steering_4_joystick'):
-        print(msg)
-        client.publish("Steering_4", str(dir_check(str(msg), steer_dir[3])))
+        global steer4
+        steer4 = msg
+        client.publish("Steering_4", str(dir_check(steer4, steer_dir[3])))
     
         
     

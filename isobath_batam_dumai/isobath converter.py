@@ -9,7 +9,7 @@ def parse_average(name):
     return sum(nums) / len(nums)
 
 # Load KML
-tree = ET.parse("isobath_dumai_batam.kml")
+tree = ET.parse("isobath_batam_rnd.kml")
 root = tree.getroot()
 
 ns = {'kml': 'http://www.opengis.net/kml/2.2'}
@@ -69,7 +69,7 @@ for placemark in root.findall(".//kml:Placemark", ns):
 
 # Save CSV
 df = pd.DataFrame(rows)
-df.to_csv("isobath_dumai_batam.csv", index=False)
+df.to_csv("isobath_batam_rnd.csv", index=False)
 
 print("Jumlah titik:", len(rows))
 print("Sukses: CSV siap")

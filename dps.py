@@ -2403,10 +2403,7 @@ class table(QObject):
             print(lat_index)
             print("index changed")
             
-        if (gps_type  == 1):
-            val_latitude = latitude_integer + latitude_fractional
-            val_longitude = longitude_integer + longitude_fractional
-
+        
         if (gps_type == 2):
             if (abs(latitude_aux) > 0.00001):
                 val_latitude = latitude_aux
@@ -2767,28 +2764,20 @@ def on_message(client, userdata, message):
 
 
 
-    if (t == "lat_nmea_integer_pc"): #GPS/lat or lat_nmea
+    if (t == "lat_nmea"): #GPS/lat or lat_nmea
         global gps_time_prev
-        global latitude_integer
+        global val_latitude
         gps_time_prev = time.time()
         
-        latitude_integer = float(msg)
-        
-
-    if (t == "lat_nmea_fractional_pc"): #GPS/lat or lat_nmea
-        
-        global latitude_fractional
-        latitude_fractional = float(msg)
+        val_latitude = float(msg)
+    
 
     
-    if (t == "long_nmea_integer_pc"): #GPS/lat or lat_nmea
+    if (t == "long_nmea"): #GPS/lat or lat_nmea
 
-        global longitude_integer        
-        longitude_integer = float(msg)
+        global val_longitude        
+        val_longitude = float(msg)
 
-    if (t == "long_nmea_fractional_pc"): #GPS/lat or lat_nmea
-        global longitude_fractional    
-        longitude_fractional = float(msg)
         
         
     if (t == "latitude_aux"):
@@ -3026,9 +3015,6 @@ if __name__ == "__main__":
 
     client.subscribe("lat_nmea_integer")
     client.subscribe("long_nmea_integer")
-
-    client.subscribe("lat_nmea_integer_pc")
-    client.subscribe("long_nmea_integer_pc")
     
     client.subscribe("lat_front")
     client.subscribe("long_front")

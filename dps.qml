@@ -2133,12 +2133,13 @@ Window {
             hideTrack: true
             interactive: false
             
-			
+			/*
 			Behavior on value {
 				NumberAnimation {
 					duration: 900
 				}
 			}
+			*/
 
             /// Custom Handle
             handle: Item {

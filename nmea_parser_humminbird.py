@@ -15,11 +15,39 @@ import serial
 import time
 import paho.mqtt.client as paho
 import threading
-
+import sys
 # ============================================================
 # KONFIGURASI - SESUAIKAN INI
 # ============================================================
-PORT = "COM3"        # Windows: "COM3", "COM4", dst.
+
+def serial_ports():
+    
+    if sys.platform.startswith('win'):
+        ports = ['COM%s' % (i + 1) for i in range(256)]
+    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        # this excludes your current terminal "/dev/tty"
+        ports = glob.glob('/dev/tty[A-Za-z]*')
+    elif sys.platform.startswith('darwin'):
+        ports = glob.glob('/dev/tty.*')
+    else:
+        raise EnvironmentError('Unsupported platform')
+
+    result = []
+    for port in ports:
+        try:
+            s = serial.Serial(port)
+            s.close()
+            result.append(port)
+        except (OSError, serial.SerialException):
+            pass
+    return result
+print(str(serial_ports()))
+
+PORT = input("write port : ")
+
+
+
+#PORT = "COM3"        # Windows: "COM3", "COM4", dst.
                       # Linux/Mac: "/dev/ttyUSB0" atau "/dev/tty.usbserial-xxxx"
 BAUD_RATE = 38400     # sesuaikan dengan converter Anda (4800 atau 38400)
 TIMEOUT = 1           # detik

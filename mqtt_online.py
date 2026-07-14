@@ -13,6 +13,11 @@ import paho.mqtt.client as paho
 import time
 import json
 import datetime
+import requests
+
+#url = "http://127.0.0.1:5000/update"
+url = "https://husnihusni100.pythonanywhere.com/update"
+
 
 
 # ----------------------------------------------------------------
@@ -127,11 +132,28 @@ if __name__ == "__main__":
             with open("position.json", "r") as f:
                 position = json.load(f)
 
-            print(position["barge"])
+            
             payload = json.dumps(position["barge"])
+            print(position["barge"]["payout"])
+            #client.publish("dps_syergie_mqtt/barge", payload)
+            data = {
+                "latitude": float(position["barge"]["latitude"]),
+                "longitude": float(position["barge"]["longitude"]),
+                "heading": float(position["barge"]["heading"]),
+                "latitude1": float(position["tug1"]["latitude"]),
+                "longitude1": float(position["tug1"]["longitude"]),
+                "heading1": float(position["tug1"]["heading"]),
+                "latitude2": float(position["tug2"]["latitude"]),
+                "longitude2": float(position["tug2"]["longitude"]),
+                "heading2": float(position["tug2"]["heading"]),
+                "payout": float(position["barge"]["payout"]),
+                "tension": 0
+                
+            }
 
-            client.publish("dps_syergie_mqtt/barge", payload)
-            time.sleep(1)
+            response = requests.post(url, json=data)
+            
+            time.sleep(3)
 
     except KeyboardInterrupt:
         print("Disconnect")

@@ -2629,6 +2629,7 @@ class table(QObject):
                 "latitude": str(val_latitude),
                 "longitude": str(val_longitude),
                 "heading": str(heading_magneto),
+                "payout": str(payout),
                 "received_time": str(date)
             }
             # baca file

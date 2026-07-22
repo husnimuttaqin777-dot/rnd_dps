@@ -9,12 +9,14 @@ format publish
 
 
 '''
-import paho.mqtt.client as paho
+import sys
 import time
 import json
 import datetime
 import requests
 
+sys.path.insert(0, "./lib")
+import paho.mqtt.client as paho
 #url = "http://127.0.0.1:5000/update"
 url = "https://husnihusni100.pythonanywhere.com/update"
 

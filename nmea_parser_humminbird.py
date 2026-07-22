@@ -13,9 +13,12 @@ Sesuaikan PORT dan BAUD_RATE di bawah sebelum dijalankan.
 
 import serial
 import time
-import paho.mqtt.client as paho
+
 import threading
 import sys
+
+sys.path.insert(0, "./lib")
+import paho.mqtt.client as paho
 # ============================================================
 # KONFIGURASI - SESUAIKAN INI
 # ============================================================

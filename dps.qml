@@ -738,6 +738,23 @@ Window {
 					onClicked:{
 						wnd_ship_parameter.visible = true
 					}
+					
+					
+					Button{
+					id : ship_center
+					x : 0
+					y : -parent.height
+					text : "ship center"
+					
+					
+					onClicked:{
+							
+							 map.center = QtPositioning.coordinate(
+								parseFloat(latitude_position_value.text),
+								parseFloat(longitude_position_value.text)
+							)
+						}
+					}
 				}
 			
 				Text {

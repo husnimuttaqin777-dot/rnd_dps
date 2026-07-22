@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtQuick import * 
 import sys
 import time
-import paho.mqtt.client as paho
+
 import numpy as np
 from math import sqrt
 
@@ -210,7 +210,11 @@ def dir_check(command, direction):
             return command
     else:
         return command
-    
+
+sys.path.insert(0, "./lib")
+
+import paho.mqtt.client as paho
+
 steer1 = "Tahan" 
 steer2 = "Tahan"
 steer3 = "Tahan"

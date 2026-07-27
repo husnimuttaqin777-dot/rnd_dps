@@ -152,8 +152,19 @@ if __name__ == "__main__":
                 "tension": 0
                 
             }
+            
+            try:
+                response = requests.post(url, json=data, timeout=5)
 
-            response = requests.post(url, json=data)
+                if response.status_code == 200:
+                    print("Data terkirim")
+                    
+                else:
+                    print(f"Server error {response.status_code}, retry...")
+
+            except requests.exceptions.RequestException as e:
+                print(f"Gagal koneksi: {e}")
+                print("Retry 5 detik...")
             
             time.sleep(3)
 

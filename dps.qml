@@ -1078,14 +1078,14 @@ Window {
 
 				MapPolyline {
 					id : line_ongoing
-					line.width: 3
-					line.color: 'red'
-					visible : true // (rpl_lat && rpl_lat.length > 0 && rpl_long && rpl_long.length > 0)
+					line.width: 4
+					line.color: 'orange'
+					visible : (rpl_lat && rpl_lat.length > 0 && rpl_long && rpl_long.length > 0)
 					path: [
 						 
-						{ latitude: latitude_position_value.text, longitude: longitude_position_value.text },
-						{ latitude: rpl_lat && rpl_lat.length > 0 ? rpl_lat[0] : latitude_position_value.text,
-                        longitude: rpl_long && rpl_long.length > 0 ? rpl_long[0] : longitude_position_value.text }
+						{ latitude: chute_lat, longitude: chute_long },
+						{ latitude: rpl_lat && rpl_lat.length > 0 ? rpl_lat[0] : chute_lat,
+                        longitude: rpl_long && rpl_long.length > 0 ? rpl_long[0] : chute_long }
 					
 					]
 				 }
@@ -1313,19 +1313,46 @@ Window {
 				checkable: true
 				
 			Button{
-				id : line2
+				id : line1
 				x: coord_format.width + (coord_format.width/10)
+				y : 0
+				width : 50
+				height : 45
+				text : "1"
+				checkable : true
+				visible : true
+				onClicked:{
+					//markerModel.clear()
+					//upload_csv()
+					//backend.estimate_rpl(1)
+					line2.checked = false
+					//markerModel.append({ "latitude":lat_mouse.text, "longitude": long_mouse.text})
+					if (line1.checked == false){
+						backend.clear_rpl("yes")
+					}
+				}
+				
+				}
+		
+			
+			Button{
+				id : line2
+				x: line1.x + line1.width + 10
 				y : 0
 				width : 50
 				height : 45
 				text : "2"
 				checkable : true
-				visible : false
+				visible : true
 				
 				onClicked:{
-					upload_csv()
-					backend.estimate_rpl(2)
+					//upload_csv()
+					//backend.estimate_rpl(2)
 					line1.checked = false
+
+					if (line2.checked == false){
+						backend.clear_rpl("yes")
+					}
 					}
 				}
 			
@@ -3935,24 +3962,6 @@ Window {
 					
 
 		
-		Button{
-				id : line1
-				x: 290
-				y : 10
-				width : 50
-				height : 45
-				text : "1"
-				checkable : true
-				visible : false
-				onClicked:{
-					//markerModel.clear()
-					upload_csv()
-					backend.estimate_rpl(1)
-					line2.checked = false
-					//markerModel.append({ "latitude":lat_mouse.text, "longitude": long_mouse.text})
-				}
-				
-				}
 				
 				
 
@@ -6547,13 +6556,13 @@ Window {
 			seacurrent.text = "est current : " + backend.current_speed() + " m/s " + backend.current_dir() + "°"		
 			//console.log(backend.current_speed(), backend.current_dir())
 			if (line1.checked == true){
-				upload_csv()
+				//upload_csv()
 				backend.estimate_rpl(1)
 			
 			}
 			
 			if (line2.checked == true){
-				upload_csv()
+				//upload_csv()
 				backend.estimate_rpl(2)
 			}
 

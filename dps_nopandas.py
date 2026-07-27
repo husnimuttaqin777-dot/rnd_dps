@@ -299,12 +299,12 @@ def body_to_latlon(lat_o, lon_o, heading_deg, relative_points):
  chute > posisi chute
 '''
 barge_relative_points = {
-    "a": np.array([0, 45]),
-    "b": np.array([8, 50]),
-    "c": np.array([16, 45]),
-    "d": np.array([16, -0]),
-    "e": np.array([0, -0]),
-    "chute": np.array([8, -0]),
+    "a": np.array([0, 35]),
+    "b": np.array([8, 40]),
+    "c": np.array([16, 35]),
+    "d": np.array([16, -10]),
+    "e": np.array([0, -10]),
+    "chute": np.array([8, -10]),
 }
 
 tug_relative_points = {
@@ -790,17 +790,13 @@ e_error = 0
 error_body_fixed = np.array([[0],[0],[0]])
 
 
-
-import pandas as pd
-
 csv_file = "sea_current_now.csv"
 
-#df = pd.read_csv(csv_file)
-
-lat_seacurrent = []#df["latitude"].tolist()
-long_seacurrent = []#df["longitude"].tolist()
-dir_seacurrent = []#df["direction"].tolist()
-speed_seacurrent = []#df["sea_current_speed"].tolist()
+#dibaca ulang di on_update_finished() lewat modul csv biasa
+lat_seacurrent = []
+long_seacurrent = []
+dir_seacurrent = []
+speed_seacurrent = []
 
 print(lat_seacurrent)
 print(long_seacurrent)
@@ -1055,7 +1051,12 @@ def log_to_csv(data_row):
         need_header = False
 
     row_dict = dict(zip(CSV_COLUMNS, [waktu.strftime("%H:%M:%S")] + data_row))
-    pd.DataFrame([row_dict]).to_csv(filename, mode='a', header=need_header, index=False)
+
+    with open(filename, mode='a', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=CSV_COLUMNS)
+        if need_header:
+            writer.writeheader()
+        writer.writerow(row_dict)
 
 
 ########## mengisi class table dengan instruksi pyqt5#############
@@ -1169,12 +1170,18 @@ class table(QObject):
 
         csv_file = "sea_current_now.csv"
         try:
-            df = pd.read_csv(csv_file)
-        
-            lat_seacurrent = df["latitude"].tolist()
-            long_seacurrent = df["longitude"].tolist()
-            dir_seacurrent = df["direction"].tolist()
-            speed_seacurrent = df["sea_current_speed"].tolist()
+            lat_seacurrent = []
+            long_seacurrent = []
+            dir_seacurrent = []
+            speed_seacurrent = []
+
+            with open(csv_file, newline='') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    lat_seacurrent.append(float(row["latitude"]))
+                    long_seacurrent.append(float(row["longitude"]))
+                    dir_seacurrent.append(float(row["direction"]))
+                    speed_seacurrent.append(float(row["sea_current_speed"]))
 
             current_dir, current_speed = find_speed_seacurrent(
                 val_latitude,
@@ -1342,10 +1349,16 @@ class table(QObject):
         global tau_propeller
         global calib_param
 
-        df = pd.read_csv(file)
+        x = []
+        y = []
+        with open(file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                x.append(float(row["x"]))
+                y.append(float(row["y"]))
 
-        x = df["x"].values
-        y = df["y"].values
+        x = np.array(x)
+        y = np.array(y)
 
         K, tau = identification(x, y)
 
@@ -1383,10 +1396,16 @@ class table(QObject):
         global tau_propeller
         global calib_param
 
-        df = pd.read_csv(file)
+        x = []
+        y = []
+        with open(file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                x.append(float(row["x"]))
+                y.append(float(row["y"]))
 
-        x = df["x"].values
-        y = df["y"].values
+        x = np.array(x)
+        y = np.array(y)
 
         K, tau = identification(x, y)
 
@@ -1414,10 +1433,16 @@ class table(QObject):
         global tau_propeller
         global calib_param
 
-        df = pd.read_csv(file)
+        x = []
+        y = []
+        with open(file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                x.append(float(row["x"]))
+                y.append(float(row["y"]))
 
-        x = df["x"].values
-        y = df["y"].values
+        x = np.array(x)
+        y = np.array(y)
 
         K, tau = identification(x, y)
 
@@ -1444,10 +1469,16 @@ class table(QObject):
         global tau_propeller
         global calib_param
 
-        df = pd.read_csv(file)
+        x = []
+        y = []
+        with open(file, newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                x.append(float(row["x"]))
+                y.append(float(row["y"]))
 
-        x = df["x"].values
-        y = df["y"].values
+        x = np.array(x)
+        y = np.array(y)
 
         K, tau = identification(x, y)
 
@@ -1481,7 +1512,8 @@ class table(QObject):
         global long_chute
         #rpl_lat = []
         #rpl_long = []
-    
+        
+        print(rpl1_lat)
         if (line == 1):
             rpl_lat_calc = rpl1_lat
             rpl_long_calc = rpl1_long
@@ -1492,14 +1524,14 @@ class table(QObject):
         
         
         theta_deg = 360 - (heading + 90)  # ke atas
-        print("heading", heading)
+
         x = np.array(rpl_long_calc)
         y = np.array(rpl_lat_calc)
         # === TITIK ASAL RAY DAN ARAHNYA ===
-        P = np.array([global_points["chute"][1], global_points["chute"][0]])
-        print(global_points["chute"])
+        P = np.array([val_longitude, val_latitude])
+
         num_lines = len(x) - 1
-        #print("num lines", num_lines)
+        print("num lines", num_lines)
         for i in range(num_lines):
             A = np.array([x[i], y[i]])
             B = np.array([x[i + 1], y[i + 1]])
@@ -3064,4 +3096,3 @@ if __name__ == "__main__":
     
     
 #----------------------------------------------------------------#
-

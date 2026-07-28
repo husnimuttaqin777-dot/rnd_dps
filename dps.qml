@@ -1316,9 +1316,9 @@ Window {
 				id : line1
 				x: coord_format.width + (coord_format.width/10)
 				y : 0
-				width : 50
-				height : 45
-				text : "1"
+				//width : 50
+				//height : 45
+				text : "Batam Line"
 				checkable : true
 				visible : true
 				onClicked:{
@@ -1337,11 +1337,11 @@ Window {
 			
 			Button{
 				id : line2
-				x: line1.x + line1.width + 10
-				y : 0
-				width : 50
-				height : 45
-				text : "2"
+				x: line1.x
+				y : line1.y + line1.height
+				//width : 50
+				//height : 45
+				text : "Dumai Line"
 				checkable : true
 				visible : true
 				

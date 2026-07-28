@@ -1497,7 +1497,7 @@ class table(QObject):
         y = np.array(rpl_lat_calc)
         # === TITIK ASAL RAY DAN ARAHNYA ===
         P = np.array([global_points["chute"][1], global_points["chute"][0]])
-        print(global_points["chute"])
+        #print(global_points["chute"])
         num_lines = len(x) - 1
         #print("num lines", num_lines)
         for i in range(num_lines):
@@ -2825,7 +2825,7 @@ def on_message(client, userdata, message):
 
     if (t == "winddirect"):
         global Wdirect
-        Wdirect = map_angle_with_offset((float(msg)),0, 360, 0, 360, 0) 
+        Wdirect = map_angle_with_offset((float(msg)),0, 360, 0, 360, -250) 
 
     if (t == "windspeed"):
         global Wspeed

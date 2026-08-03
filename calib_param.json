@@ -1,8 +1,8 @@
 {
-    "steering1_offset": 0,
-    "steering2_offset": 0,
-    "steering3_offset": 0,
-    "steering4_offset": 0,
+    "steering1_offset": -55,
+    "steering2_offset": -90,
+    "steering3_offset": 90,
+    "steering4_offset": -270,
     "steering_raw_min": [
         355,
         0,

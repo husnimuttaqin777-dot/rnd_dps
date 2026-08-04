@@ -130,10 +130,11 @@ if __name__ == "__main__":
     try:
 
         while True:
-            
-            with open("position.json", "r") as f:
-                position = json.load(f)
-
+            try:
+                with open("position.json", "r") as f:
+                    position = json.load(f)
+            except:
+                pass
             
             payload = json.dumps(position["barge"])
             print(position["barge"]["payout"])

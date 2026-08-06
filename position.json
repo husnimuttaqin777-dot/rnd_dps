@@ -1,21 +1,21 @@
 {
     "tug1": {
-        "latitude": -6.898147,
-        "longitude": 107.63,
+        "latitude": 0,
+        "longitude": 0,
         "heading": 237.1103,
         "received_time": "2026-07-14 21:10:59"
     },
     "tug2": {
-        "latitude": "1.6533388071438695",
-        "longitude": "101.51929189617022",
+        "latitude": "0",
+        "longitude": "0",
         "heading": 0,
         "received_time": "2026-07-14 11:53:10"
     },
     "barge": {
-        "latitude": "1.699854",
-        "longitude": "101.537588",
-        "heading": "326",
-        "payout": "132.0",
-        "received_time": "2026-08-04 16:38:04"
+        "latitude": "1.701469",
+        "longitude": "101.538281",
+        "heading": "95",
+        "payout": "0",
+        "received_time": "2026-08-06 15:26:00"
     }
 }

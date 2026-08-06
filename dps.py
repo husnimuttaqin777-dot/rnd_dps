@@ -1037,7 +1037,8 @@ CSV_COLUMNS = [
     "propeller_speed1", "propeller_speed2", "propeller_speed3", "propeller_speed4",
     "str1_target", "str2_target", "str3_target", "str4_target",
     "heading", "heading_target", "navigation_mode_text",
-    "position_error", "dir_error", "payout", "lat_chute", "long_chute"
+    "position_error", "dir_error", "payout", "lat_chute", "long_chute",
+    "wind speed", "wind direction"
 ]
 
 _header_written_for_date = None  # global tracker
@@ -2623,7 +2624,8 @@ class table(QObject):
                 round(propeller_speed1, 0), round(propeller_speed2, 0), round(propeller_speed3, 0), round(propeller_speed4, 0),
                 round(str1_target, 0), round(str2_target, 0), round(str3_target, 0), round(str4_target, 0),
                 heading, heading_target, navigation_mode_text,
-                position_error, dir_error, payout, lat_chute, long_chute
+                position_error, dir_error, payout, lat_chute, long_chute,
+                Wspeed, Wdirect
             ]
             log_to_csv(data_row)
             date = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

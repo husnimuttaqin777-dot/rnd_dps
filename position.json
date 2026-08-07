@@ -12,10 +12,10 @@
         "received_time": "2026-07-14 11:53:10"
     },
     "barge": {
-        "latitude": "1.701469",
-        "longitude": "101.538281",
-        "heading": "95",
-        "payout": "0",
-        "received_time": "2026-08-06 15:26:00"
+        "latitude": "1.699938",
+        "longitude": "101.537549",
+        "heading": "284",
+        "payout": "263.0",
+        "received_time": "2026-08-07 17:34:50"
     }
 }

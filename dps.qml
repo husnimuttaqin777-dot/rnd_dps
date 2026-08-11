@@ -394,6 +394,7 @@ Window {
                 id: map
                 x: 0
                 y: 0
+				
                 width: parent.width
                 height: parent.height
                 color: "#f9f9f9"
@@ -413,6 +414,7 @@ Window {
                 copyrightsVisible: true
                 antialiasing: true
                 maximumTilt: 89.3
+				bearing : bearing_slider.value
                 plugin: mapPlugin
                 activeMapType: supportedMapTypes[1]
 
@@ -1289,7 +1291,25 @@ Window {
                     } 
                 }
             }	
-        }
+        
+		
+			Slider{
+				id : bearing_slider
+				width : 250
+				from : -180
+				to : 180
+				value : 0
+				
+				Text{
+					x : bearing_slider.width
+					text : (bearing_slider.value).toFixed(0)
+				}
+				
+			}
+			
+			
+			
+		}
 
 		Text {
 				id : position_error

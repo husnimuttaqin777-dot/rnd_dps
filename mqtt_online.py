@@ -138,7 +138,7 @@ if __name__ == "__main__":
             
             payload = json.dumps(position["barge"])
             print(position["barge"]["payout"])
-            #client.publish("dps_syergie_mqtt/barge", payload)
+            client.publish("dps_syergie_mqtt/barge", payload)
             data = {
                 "latitude": float(position["barge"]["latitude"]),
                 "longitude": float(position["barge"]["longitude"]),
@@ -155,7 +155,7 @@ if __name__ == "__main__":
             }
             
             try:
-                response = requests.post(url, json=data, timeout=5)
+                response = requests.post(url, json=data, timeout=1)
 
                 if response.status_code == 200:
                     print("Data terkirim")
@@ -167,7 +167,7 @@ if __name__ == "__main__":
                 print(f"Gagal koneksi: {e}")
                 print("Retry 5 detik...")
             
-            time.sleep(3)
+            time.sleep(1)
 
     except KeyboardInterrupt:
         print("Disconnect")

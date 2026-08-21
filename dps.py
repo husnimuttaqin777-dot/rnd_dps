@@ -33,7 +33,7 @@ import threading
 
 
 
-isobath_file = "isobath_dumai.csv"
+isobath_file = "isobath_dumai_batam.csv"
 
 
 intersection_points = []
@@ -263,6 +263,44 @@ points2 = [
     {"latitude": lat, "longitude": lon, "name": name, "color": color}
     for lat, lon, name, color in zip(rpl2_lat, rpl2_long, names2, colors2)
 ]
+
+
+anchor_lat = []
+anchor_long = []
+anchor_icon = []
+
+
+def load_anchor_csv():
+    global anchor_lat
+    global anchor_long
+    global anchor_icon
+
+    anchor_lat = []
+    anchor_long = []
+    anchor_icon = []
+
+    try:
+        with open("anchor.csv", "r", newline="") as file:
+            reader = csv.DictReader(file)
+
+            for row in reader:
+                anchor_lat.append(float(row["anchor_lat"]))
+                anchor_long.append(float(row["anchor_long"]))
+                anchor_icon.append(row.get("icon", "anchor").strip() or "anchor")
+
+        #print("Anchor berhasil dibaca dari CSV")
+        #print("Icon     :", anchor_icon)
+        #print("Latitude :", anchor_lat)
+        #print("Longitude:", anchor_long)
+
+    except Exception as e:
+        print("Gagal membaca anchor.csv:", e)
+        
+
+load_anchor_csv()
+
+
+
 
 
 R_EARTH = 6378137  # meter
@@ -1795,6 +1833,9 @@ class table(QObject):
     
     
     
+    
+    
+    
     @pyqtSlot(result = float)
     def heading_speed(self):return round(heading_speed,2)
     
@@ -1840,6 +1881,15 @@ class table(QObject):
 
     @pyqtSlot(result=list)
     def rpl_long(self):return rpl_long
+    
+    
+    @pyqtSlot(result='QVariantList')
+    def anchor_points(self):
+        # Mengembalikan list [ [lat, long, icon], ... ] dari anchor_lat, anchor_long & anchor_icon
+        points = []
+        for lat, lon, icon in zip(anchor_lat, anchor_long, anchor_icon):
+            points.append([float(lat), float(lon), icon])
+        return points
 
 
     @pyqtSlot(int)
@@ -2589,7 +2639,8 @@ class table(QObject):
 
         mqtt_message_time = time.time() - mqtt_message_time_prev
         
-        if (mqtt_message_time > 1):  
+        if (mqtt_message_time > 1):
+            load_anchor_csv()
             
             heading_speed =(0.8 * heading_speed) + (0.2 *shortest_psi(heading,heading_prev)/0.2)
             

@@ -148,6 +148,34 @@ Window {
 
 	property var k_propeller_prev : [0,0,0,0];
 	property var tau_propeller_prev : [0,0,0,0];
+	
+	
+	function loadAnchors() {
+		var anchors = backend.anchor_points()
+
+		anchorModel.clear()
+
+		for (var i = 0; i < anchors.length; i++) {
+			anchorModel.append({
+				"lat": anchors[i][0],
+				"lon": anchors[i][1],
+				"icon": anchors[i][2]
+			})
+		}
+	}
+
+	function iconSymbol(iconName) {
+		switch (iconName) {
+			case "anchor": return "\u2693"
+			case "buoy":   return "\uD83C\uDFEE"
+			case "flag":   return "\u2691"
+			case "dot":    return "\u25CF"
+			case "boat":   return "\u26F5"
+			default:       return "\u2693"
+		}
+	}
+
+	
 
 
 	function toRadians(degrees) {
@@ -242,6 +270,10 @@ Window {
 	ListModel {
         id: wind_model
     }
+	
+	ListModel{
+		id: anchorModel
+	}
 
     function update_seacurrent_data(){
         current_sea_model.clear()
@@ -419,7 +451,7 @@ Window {
                 activeMapType: supportedMapTypes[1]
 
                 //center: QtPositioning.coordinate(latitude_position_value.text, longitude_position_value.text)
-                center: QtPositioning.coordinate(1.6531739954186195 , 101.51870957698065)
+                center: QtPositioning.coordinate(1.1505839236549436 , 103.90737353605908)
 				//center: QtPositioning.coordinate(latitude_position_value.text, longitude_position_value.text)
 				gesture.enabled: true
                 gesture.acceptedGestures: MapGestureArea.PinchGesture | MapGestureArea.PanGesture
@@ -848,6 +880,41 @@ Window {
 				Line{
                     id: li
                 }
+				
+				
+				MapItemView {
+                    id: mivAnchor
+                    model: anchorModel
+                    delegate: Component {
+                        MapQuickItem {
+                            coordinate: QtPositioning.coordinate(lat, lon)
+                            anchorPoint.x: anchorIconItem.width / 2
+                            anchorPoint.y: anchorIconItem.height
+                            sourceItem: Column {
+                                id: anchorIconItem
+                                spacing: 2
+
+                                Text {
+                                    text: iconSymbol(icon)
+                                    font.pixelSize: 26
+                                    color: "#1b1b1b"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+
+                                Rectangle {
+                                    width: 9
+                                    height: 9
+                                    radius: 4.5
+                                    color: "red"
+                                    border.color: "black"
+                                    border.width: 1
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                        }
+                    }
+                }
+				
 
 
 				
@@ -1498,6 +1565,37 @@ Window {
 		
 
 		}
+		
+		
+		Button {
+            id: anchor
+            x: (parent.width/1.5) - 70
+            y: 0
+            text : ""
+			width : 70
+			height  :70
+            checkable: true
+            checked: false 
+            visible : true
+			
+			Rectangle{
+				width : parent.width
+				height : parent.height
+				border.width : 3
+				border.color : "black"
+				color : "transparent"
+			}
+
+
+			Image{
+				anchors.centerIn: parent
+				width : parent.width - 20
+				height : parent.height - 20
+				source : "anchor.png"
+			}
+
+		}
+		
 		
 		
 		Rectangle { 
@@ -4032,35 +4130,6 @@ Window {
 				
 
 
-		Button {
-            id: anchor
-            x: 550
-            y: 450
-            text : ""
-			width : 70
-			height  :70
-            checkable: true
-            checked: false 
-            visible : false
-			
-			Rectangle{
-				width : parent.width
-				height : parent.height
-				border.width : 3
-				border.color : "black"
-				color : "transparent"
-			}
-
-
-			Image{
-				anchors.centerIn: parent
-				width : parent.width - 20
-				height : parent.height - 20
-				source : "anchor.png"
-			}
-
-		}
-		
 		
 		
 
@@ -6457,8 +6526,39 @@ Window {
                     }
                 `, map, "Circle_" + i);
                 map.addMapItem(circle);
+				
+				var label = Qt.createQmlObject(`
+					import QtQuick 2.12
+					import QtLocation 5.11
+					import QtPositioning 5.11
+					MapQuickItem {
+						coordinate: QtPositioning.coordinate(${p.latitude}, ${p.longitude})
+						anchorPoint.x: 40
+						anchorPoint.y: 60
+						sourceItem: Rectangle {
+							color: "white"
+							border.color: "black"
+							border.width: 1
+							radius: 4
+							width: textItem.paintedWidth + 10
+							height: textItem.paintedHeight + 6
+
+							Text {
+								id: textItem
+								text: "${p.name}"
+								anchors.centerIn: parent
+								color: "black"
+								font.pointSize: 10
+								font.bold: true
+							}
+						}
+					}
+				`, map, "Label2_" + i);
+				map.addMapItem(label);
 
 			}
+			
+			
 			
 			
 
@@ -6600,6 +6700,7 @@ Window {
 		running: true
 		onTriggered: {
 			//console.log(backend.steer1())
+			loadAnchors()
 
 			if (backend.steer1() == "Kanan"){
 				steer1_dir.text = ">" 

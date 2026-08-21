@@ -1574,7 +1574,7 @@ Window {
             text : ""
 			width : 70
 			height  :70
-            checkable: true
+            checkable: false
             checked: false 
             visible : true
 			
@@ -1593,10 +1593,147 @@ Window {
 				height : parent.height - 20
 				source : "anchor.png"
 			}
+			
+			onClicked:{
+				anchor_page.visible = true
+				
+			}
 
 		}
 		
-		
+		Window {
+			id: anchor_page
+			width: 500
+			height: 500
+			visible: false
+			title: "Anchor Points"
+
+			ListModel {
+				id: anchorEditModel
+			}
+
+			Component.onCompleted: {
+				syncFromAnchorModel()
+			}
+
+			function syncFromAnchorModel() {
+				anchorEditModel.clear()
+				for (var i = 0; i < anchorModel.count; i++) {
+					var row = anchorModel.get(i)
+					anchorEditModel.append({
+						"icon": row.icon,
+						"lat": row.lat.toString(),
+						"long": row.lon.toString()
+					})
+				}
+			}
+
+			function openAnchorEditor() {
+				syncFromAnchorModel()
+				anchor_page.visible = true
+			}
+
+			function saveAnchorEditor() {
+				var icons = []
+				var lats = []
+				var longs = []
+				for (var i = 0; i < anchorEditModel.count; i++) {
+					var row = anchorEditModel.get(i)
+					icons.push(row.icon)
+					lats.push(parseFloat(row.lat))
+					longs.push(parseFloat(row.long))
+				}
+				backend.save_anchors(icons, lats, longs)
+				loadAnchors()
+			}
+
+			ColumnLayout {
+				anchors.fill: parent
+				anchors.margins: 10
+				spacing: 8
+
+				RowLayout {
+					Layout.fillWidth: true
+					Text { text: "Icon"; Layout.preferredWidth: 120; font.bold: true }
+					Text { text: "Latitude"; Layout.preferredWidth: 120; font.bold: true }
+					Text { text: "Longitude"; Layout.preferredWidth: 120; font.bold: true }
+					Item { Layout.preferredWidth: 30 }
+				}
+
+				ListView {
+					id: anchorListView
+					Layout.fillWidth: true
+					Layout.fillHeight: true
+					model: anchorEditModel
+					clip: true
+
+					delegate: RowLayout {
+						width: anchorListView.width
+						spacing: 6
+
+						TextField {
+							Layout.preferredWidth: 120
+							text: model.icon
+							onTextChanged: model.icon = text
+						}
+						TextField {
+							Layout.preferredWidth: 120
+							text: model.lat
+							onTextChanged: model.lat = text
+						}
+						TextField {
+							Layout.preferredWidth: 120
+							text: model.long
+							onTextChanged: model.long = text
+						}
+						Button {
+							Layout.preferredWidth: 30
+							text: "X"
+							onClicked: anchorEditModel.remove(index)
+						}
+					}
+				}
+
+				RowLayout {
+					Layout.fillWidth: true
+					spacing: 8
+
+					Button {
+						text: "Add"
+						onClicked: anchorEditModel.append({"icon": "anchor", "lat": "0.0", "long": "0.0"})
+						
+						
+					}
+
+					Button {
+						text: "Save"
+						//onClicked: anchor_page.saveAnchorEditor()
+						
+						 onClicked: {
+							
+							var icons = []
+							var lats = []
+							var longs = []
+							for (var i = 0; i < anchorEditModel.count; i++) {
+								var row = anchorEditModel.get(i)
+								icons.push(row.icon)
+								lats.push(parseFloat(row.lat))
+								longs.push(parseFloat(row.long))
+							}
+							backend.change_anchor_csv(icons, lats, longs)
+						}
+					}
+
+					Item { Layout.fillWidth: true }
+
+					Button {
+						text: "Close"
+						onClicked: anchor_page.visible = false
+					}
+				}
+			}
+	}
+    
 		
 		Rectangle { 
 			id : joystick_color
@@ -6482,6 +6619,7 @@ Window {
 
 	
 	Component.onCompleted: {
+		loadAnchors()
 				console.log("Application started")
 				backend.update_data("update")
                 update_seacurrent_data()

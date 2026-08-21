@@ -288,10 +288,7 @@ def load_anchor_csv():
                 anchor_long.append(float(row["anchor_long"]))
                 anchor_icon.append(row.get("icon", "anchor").strip() or "anchor")
 
-        #print("Anchor berhasil dibaca dari CSV")
-        #print("Icon     :", anchor_icon)
-        #print("Latitude :", anchor_lat)
-        #print("Longitude:", anchor_long)
+
 
     except Exception as e:
         print("Gagal membaca anchor.csv:", e)
@@ -2042,6 +2039,26 @@ class table(QObject):
         print(rpl_lat)
         print(rpl_long)
         
+        
+    @pyqtSlot('QVariantList', 'QVariantList', 'QVariantList')
+    def change_anchor_csv(self, icons, lats, longs):
+        global anchor_lat
+        global anchor_long
+        global anchor_icon
+
+        anchor_icon = [str(i) for i in icons]
+        anchor_lat = [float(l) for l in lats]
+        anchor_long = [float(l) for l in longs]
+
+        try:
+            with open("anchor.csv", "w", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(["icon", "anchor_lat", "anchor_long"])
+                for icon, lat, lon in zip(anchor_icon, anchor_lat, anchor_long):
+                    writer.writerow([icon, lat, lon])
+            print("anchor.csv berhasil diperbarui")
+        except Exception as e:
+            print("Gagal update anchor.csv:", e)
 
        
         
